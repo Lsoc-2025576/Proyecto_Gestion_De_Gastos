@@ -1,0 +1,32 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-badge">B</div>
+    <h2>BITCORE</h2>
+    <p class="subtitle">Gestor de Gastos</p>
+
+    <form (submit)="onLogin($event)">
+      <div class="input-group">
+        <label>Correo Electrónico</label>
+        <input type="email" [(ngModel)]="email" name="email" required placeholder="nombre@bitcore.com">
+      </div>
+
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn-submit">Iniciar Sesión →</button>
+    </form>
+
+    <div class="register-link">
+      ¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a>
+    </div>
+  </div>
+
+  @if (sessionExpiredMessage()) {
+  <div class="session-toast">
+    Tu sesión ha expirado. Por favor, inicia sesión de nuevo.
+  </div>
+  }
+
+</div>

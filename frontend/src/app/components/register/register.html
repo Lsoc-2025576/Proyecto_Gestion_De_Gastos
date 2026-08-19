@@ -1,0 +1,30 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="logo-badge">B</div>
+    <h2>BITCORE</h2>
+    <p class="subtitle">Crear Cuenta - Gestor de Gastos</p>
+
+    <form (submit)="onRegister($event)">
+      <div class="input-group">
+        <label>Nombre Completo</label>
+        <input type="text" [(ngModel)]="name" name="name" required placeholder="Tu nombre">
+      </div>
+
+      <div class="input-group">
+        <label>Correo Electrónico</label>
+        <input type="email" [(ngModel)]="email" name="email" required placeholder="nombre@bitcore.com">
+      </div>
+
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn-submit">Registrarse →</button>
+    </form>
+
+    <div class="login-link">
+      ¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a>
+    </div>
+  </div>
+</div>

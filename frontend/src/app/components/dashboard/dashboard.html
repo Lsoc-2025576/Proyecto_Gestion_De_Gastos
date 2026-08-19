@@ -1,0 +1,24 @@
+<div class="dashboard-container">
+  
+  <header class="navbar">
+    <div class="logo-section">
+      <div class="logo-badge">B</div>
+      <div>
+        <h1>BITCORE</h1>
+        <p>Gestor de Gastos</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button routerLink="/profile" class="btn-profile">👤 Mi Perfil</button>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </header>
+
+
+  <main class="dashboard-main">
+    <div class="welcome-card">
+      <h2>¡Bienvenido, {{ user.name || 'Usuario' }}! 👋</h2>
+      <p>Has iniciado sesión correctamente en el sistema de gestión de gastos Bitcore.</p>
+    </div>
+  </main>
+</div>
