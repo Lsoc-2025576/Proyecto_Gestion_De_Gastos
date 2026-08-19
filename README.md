@@ -311,4 +311,4 @@ cd frontend
 pnpm install
 
 # 3. Iniciar la aplicación de Angular
-pnpm start
+pnpm starttaskkill /f /im node.exe

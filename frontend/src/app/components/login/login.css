@@ -27,21 +27,6 @@
   z-index: 10;
 }
 
-.logo-badge {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #4f46e5, #06b6d4);
-  color: white;
-  font-size: 24px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  margin: 0 auto 16px auto;
-  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.5);
-}
-
 h2 {
   text-align: center;
   color: #f8fafc;
@@ -142,4 +127,28 @@ h2 {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- NUEVO: CONTENEDOR Y RECORTE DEL LOGO --- */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logo-wrapper {
+  width: 90px;  /* Tamaño visible del cuadro del logo */
+  height: 90px; 
+  overflow: hidden; /* Esto oculta todo el espacio transparente sobrante de la imagen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-logo {
+  width: 220px;       /* Al ser más grande que el wrapper, hace zoom automático */
+  max-width: none;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
