@@ -42,7 +42,7 @@ export class LoginComponent {
 
           // La notificación se oculta sola después de 4 segundos
           setTimeout(() => this.sessionExpiredMessage.set(false), 4000);
-        }, 60 * 1000);
+        }, 60 * 60 * 1000 );
       } else {
         alert(data.message || 'Error al iniciar sesión');
       }

@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express';
 import { AuthService } from '../services/auth.services.js';
+import { type AuthenticatedRequest } from '../middlewares/auth.middleware.js';
 
 export class AuthController {
   static async register(req: Request, res: Response) {
@@ -34,12 +35,12 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 1000, // debe coincidir con JWT_EXPIRES_IN
+        maxAge: 60 * 60 * 1000,
       });
 
       return res.status(200).json({
         message: 'Inicio de sesión exitoso',
-        user: data.user, // ya no mandamos el token en el body
+        user: data.user,
       });
     } catch (error: any) {
       return res.status(401).json({ message: error.message || 'Error de autenticación' });
@@ -49,5 +50,9 @@ export class AuthController {
   static logout(req: Request, res: Response) {
     res.clearCookie('token');
     return res.status(200).json({ message: 'Sesión cerrada' });
+  }
+
+  static async me(req: AuthenticatedRequest, res: Response) {
+    return res.status(200).json({ user: req.user });
   }
 }
