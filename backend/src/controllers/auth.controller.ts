@@ -16,17 +16,43 @@ import { ValidationError } from '../middlewares/error-handler.middleware.js';
  */
 
 /**
+ * Convierte el formato de tiempo de jsonwebtoken ('1m', '8h', '1d', etc.)
+ * a milisegundos, para que la cookie use exactamente la misma duracion que el JWT.
+ * 
+ * FIX: Antes el maxAge de la cookie estaba hardcodeado en 8h, sin importar
+ * lo que dijera JWT_EXPIRES_IN en el .env. Ahora ambos leen del mismo lugar,
+ * asi que solo hay que tocar el .env para cambiar la duracion de la sesion.
+ */
+function getCookieMaxAge(): number {
+  const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
+  const match = expiresIn.match(/^(\d+)([smhd])$/);
+
+  if (!match) return 1000 * 60 * 60 * 8; // fallback: 8 horas si el formato no es valido
+
+  const value = parseInt(match[1]!);
+  const unit = match[2]!;
+  const multipliers: Record<string, number> = {
+    s: 1000,
+    m: 60000,
+    h: 3600000,
+    d: 86400000,
+  };
+
+  return value * multipliers[unit]!;
+}
+
+/**
  * Opciones de la cookie de sesion.
  * httpOnly: true  -> El frontend NO puede leerla con JS (protege contra XSS)
  * secure: true    -> Solo se envia por HTTPS (en produccion)
  * sameSite: strict-> No se envia en peticiones de otros sitios (protege contra CSRF)
- * maxAge: 8h      -> Coincide con la expiracion del JWT
+ * maxAge          -> Lee JWT_EXPIRES_IN del .env, coincide REALMENTE con el JWT
  */
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict' as const,
-  maxAge: 1000 * 60 * 60 * 8, // 8 horas en milisegundos
+  maxAge: getCookieMaxAge(),
 };
 
 /**

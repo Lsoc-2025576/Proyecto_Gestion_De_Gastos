@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,44 +12,45 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   email = '';
   password = '';
-  sessionExpiredMessage = signal(false);
+  errorMessage = '';
+  isLoading = false;
 
-  constructor(private router: Router) {}
+  // Exponemos el signal directo del AuthService para usarlo en el HTML
+  sessionExpired = this.authService.sessionExpired;
 
-  async onLogin(event: Event) {
-    event.preventDefault();
-    try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: this.email, password: this.password })
-      });
+  login() {
+    // Si el usuario intenta loguearse de nuevo, ocultamos el aviso de "sesion expirada"
+    this.authService.clearSessionExpiredFlag();
 
-      const data = await response.json();
-
-      if (response.ok) {
-        this.router.navigate(['/dashboard']);
-
-        setTimeout(async () => {
-          await fetch('http://localhost:3000/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
-          });
-          this.router.navigate(['/login']);
-          this.sessionExpiredMessage.set(true);
-
-          // La notificación se oculta sola después de 4 segundos
-          setTimeout(() => this.sessionExpiredMessage.set(false), 4000);
-        }, 60 * 60 * 1000 );
-      } else {
-        alert(data.message || 'Error al iniciar sesión');
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      alert('No se pudo conectar con el servidor backend.');
+    // Validacion basica antes de enviar
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Email y contrasena son obligatorios.';
+      return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login({ email: this.email, password: this.password })
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success) {
+            // FIX: El backend ya seteo la cookie. No guardamos nada en localStorage.
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.errorMessage = response.message || 'Error al iniciar sesion';
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.message || 'Error de conexion';
+        }
+      });
   }
 }

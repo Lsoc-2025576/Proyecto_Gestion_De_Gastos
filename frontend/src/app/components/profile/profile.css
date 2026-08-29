@@ -215,34 +215,3 @@
   font-size: 12px !important;
 }
 
-.token-section {
-  background: rgba(2, 6, 23, 0.6);
-  border: 1px solid #1e293b;
-  border-radius: 14px;
-  padding: 16px;
-}
-
-.token-section label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #94a3b8;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.token-box {
-  background: #020617;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  padding: 10px;
-  overflow-x: auto;
-}
-
-.token-box code {
-  font-family: monospace;
-  font-size: 11px;
-  color: #38bdf8;
-  word-break: break-all;
-}

@@ -1,11 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet], // <-- ¡Esta línea es clave para que funcionen las rutas!
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App implements OnInit {
+  private authService = inject(AuthService);
+
+  ngOnInit() {
+    // Al arrancar la app, verificamos si hay una sesion activa.
+    // Esto evita que el usuario tenga que loguearse de nuevo al refrescar la pagina.
+    this.authService.checkSession().subscribe();
+  }
+}

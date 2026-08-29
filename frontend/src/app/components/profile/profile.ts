@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { type User } from '../../types/auth.types';
 
 @Component({
   selector: 'app-profile',
@@ -10,25 +12,31 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./profile.css']
 })
 export class ProfileComponent implements OnInit {
-  user: any = {};
-  token: string | null = null;
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private router: Router) {}
+  // FIX: Usamos el signal tipado del AuthService.
+  // Antes: leiamos de localStorage (inseguro) y usabamos 'any'.
+  // Ahora: los datos vienen del backend via cookie httpOnly y estan tipados.
+  get user(): User | null {
+    return this.authService.user();
+  }
 
   ngOnInit() {
-    this.token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-
-    if (!this.token || !storedUser) {
-      this.router.navigate(['/login']);
-    } else {
-      this.user = JSON.parse(storedUser);
-    }
+    // FIX: Ya no leemos localStorage.
+    // El authGuard ya verifico que hay sesion antes de cargar este componente.
+    // Los datos del usuario vienen del AuthService (que los obtuvo de /api/auth/me).
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        this.authService.clearUser();
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }

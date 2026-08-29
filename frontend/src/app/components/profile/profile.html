@@ -20,11 +20,11 @@
       
       <!-- Cabecera de la tarjeta con insignia de Rol -->
       <div class="profile-header">
-        <div class="user-avatar">{{ user.name ? user.name.charAt(0).toUpperCase() : 'U' }}</div>
+        <div class="user-avatar">{{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}</div>
         <div>
-          <h2>{{ user.name || 'Usuario' }}</h2>
-          <span class="role-badge" [ngClass]="{'admin-badge': user.role === 'ADMIN', 'user-badge': user.role !== 'ADMIN'}">
-            {{ user.role || 'USER' }}
+          <h2>{{ user?.name || 'Usuario' }}</h2>
+          <span class="role-badge" [ngClass]="{'admin-badge': user?.role === 'ADMIN', 'user-badge': user?.role !== 'ADMIN'}">
+            {{ user?.role || 'USER' }}
           </span>
         </div>
       </div>
@@ -32,7 +32,7 @@
       <!-- Descripción dinámica según el rol -->
       <div class="role-description">
         <h3>Perfil de Acceso</h3>
-        <p *ngIf="user.role === 'ADMIN'; else standardUserDesc">
+        <p *ngIf="user?.role === 'ADMIN'; else standardUserDesc">
           <strong>Administrador del Sistema:</strong> Posee control total sobre la plataforma, con privilegios avanzados para la gestión de usuarios, supervisión global de registros financieros, control de políticas de seguridad y administración de configuraciones críticas del sistema Bitcore.
         </p>
         <ng-template #standardUserDesc>
@@ -46,20 +46,12 @@
       <div class="details-grid">
         <div class="detail-item">
           <label>Identificador Único (ID)</label>
-          <p class="code-text">{{ user.id || user.userId || 'No disponible' }}</p>
+          <p class="code-text">{{ user?.id || 'No disponible' }}</p>
         </div>
 
         <div class="detail-item">
           <label>Correo Electrónico</label>
-          <p>{{ user.email || 'No disponible' }}</p>
-        </div>
-      </div>
-
-      <!-- Token JWT Activo -->
-      <div class="token-section">
-        <label>Token de Sesión (JWT)</label>
-        <div class="token-box">
-          <code>{{ token || 'Sin token activo' }}</code>
+          <p>{{ user?.email || 'No disponible' }}</p>
         </div>
       </div>
 

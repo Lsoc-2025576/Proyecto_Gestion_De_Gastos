@@ -8,15 +8,15 @@ if (!email) {
   process.exit(1);
 }
 
-async function main() {
+async function main(email: string) {
   const user = await prisma.user.update({
     where: { email },
-    data: { role: 'ADMIN' }, // Ahora Prisma valida que sea 'ADMIN' o 'CLIENTE'
+    data: { role: 'ADMIN' },
   });
   console.log('✅ Usuario actualizado a ADMIN:', user.email);
 }
 
-main()
+main(email)
   .catch((e) => {
     console.error('❌ Error:', e.message);
     process.exit(1);

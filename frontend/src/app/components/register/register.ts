@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -11,32 +12,41 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./register.css']
 })
 export class RegisterComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   name = '';
   email = '';
   password = '';
+  errorMessage = '';
+  isLoading = false;
 
-  constructor(private router: Router) {}
-
-  async onRegister(event: Event) {
+  onRegister(event: Event) {
     event.preventDefault();
-    try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: this.name, email: this.email, password: this.password })
-      });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('¡Cuenta creada con éxito! Por favor inicia sesión.');
-        this.router.navigate(['/login']);
-      } else {
-        alert(data.message || 'Error al registrar usuario');
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      alert('No se pudo conectar con el servidor backend.');
+    if (!this.name || !this.email || !this.password) {
+      this.errorMessage = 'Todos los campos son obligatorios.';
+      return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.register({ name: this.name, email: this.email, password: this.password })
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success) {
+            alert('¡Cuenta creada con éxito! Por favor inicia sesión.');
+            this.router.navigate(['/login']);
+          } else {
+            this.errorMessage = response.message || 'Error al registrar usuario';
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.message || 'No se pudo conectar con el servidor backend.';
+        }
+      });
   }
 }
