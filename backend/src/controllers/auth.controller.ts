@@ -1,58 +1,134 @@
 import { type Request, type Response } from 'express';
 import { AuthService } from '../services/auth.services.js';
 import { type AuthenticatedRequest } from '../middlewares/auth.middleware.js';
+import { ValidationError } from '../middlewares/error-handler.middleware.js';
+
+/**
+ * Controller de autenticacion.
+ * 
+ * RESPONSABILIDAD: Recibir requests HTTP, extraer datos, llamar al Service, devolver responses.
+ * 
+ * REGLA:
+ *   - SI importa express (req, res)
+ *   - NO tiene logica de negocio (no pregunta "existe el email?")
+ *   - NO hace try/catch (el errorHandler global lo hace)
+ *   - NO valida a mano con "if (!email)" (usamos funciones helper)
+ */
+
+/**
+ * Opciones de la cookie de sesion.
+ * httpOnly: true  -> El frontend NO puede leerla con JS (protege contra XSS)
+ * secure: true    -> Solo se envia por HTTPS (en produccion)
+ * sameSite: strict-> No se envia en peticiones de otros sitios (protege contra CSRF)
+ * maxAge: 8h      -> Coincide con la expiracion del JWT
+ */
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  maxAge: 1000 * 60 * 60 * 8, // 8 horas en milisegundos
+};
+
+/**
+ * Valida que los campos obligatorios existan.
+ * Si falta algo, lanza ValidationError que el errorHandler convierte en 400.
+ * 
+ * NOTA: Esto es una validacion basica. Si en el futuro quieres algo mas robusto
+ * (email con formato, password minimo 6 chars, etc.), considera agregar Zod.
+ */
+function validateRegisterBody(body: any): { name: string; email: string; password: string } {
+  const { name, email, password } = body;
+  const missing: string[] = [];
+
+  if (!name || typeof name !== 'string') missing.push('name');
+  if (!email || typeof email !== 'string') missing.push('email');
+  if (!password || typeof password !== 'string') missing.push('password');
+
+  if (missing.length > 0) {
+    throw new ValidationError(`Campos obligatorios faltantes: ${missing.join(', ')}`);
+  }
+
+  return { name, email, password };
+}
+
+function validateLoginBody(body: any): { email: string; password: string } {
+  const { email, password } = body;
+  const missing: string[] = [];
+
+  if (!email || typeof email !== 'string') missing.push('email');
+  if (!password || typeof password !== 'string') missing.push('password');
+
+  if (missing.length > 0) {
+    throw new ValidationError(`Campos obligatorios faltantes: ${missing.join(', ')}`);
+  }
+
+  return { email, password };
+}
 
 export class AuthController {
+  /**
+   * POST /api/auth/register
+   * Registra un usuario nuevo.
+   */
   static async register(req: Request, res: Response) {
-    try {
-      const { name, email, password } = req.body;
+    // Extraemos y validamos el body. Si falla, lanza ValidationError -> errorHandler responde 400.
+    const { name, email, password } = validateRegisterBody(req.body);
 
-      if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
-      }
+    const newUser = await AuthService.registerUser({ name, email, password });
 
-      const newUser = await AuthService.registerUser({ name, email, password });
-      return res.status(201).json({
-        message: 'Usuario registrado exitosamente',
-        user: newUser,
-      });
-    } catch (error: any) {
-      return res.status(400).json({ message: error.message || 'Error en el servidor' });
-    }
+    return res.status(201).json({
+      success: true,
+      message: 'Usuario registrado exitosamente',
+      data: { user: newUser },
+    });
   }
 
+  /**
+   * POST /api/auth/login
+   * Inicia sesion y setea la cookie con el JWT.
+   */
   static async login(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
+    const { email, password } = validateLoginBody(req.body);
 
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email y contraseña son obligatorios.' });
-      }
+    const { user, token } = await AuthService.loginUser(email, password);
 
-      const data = await AuthService.loginUser(email, password);
+    // El Controller es el UNICO lugar que sabe de cookies.
+    // El Service solo devuelve el token string. Aqui decidimos donde ponerlo.
+    res.cookie('token', token, COOKIE_OPTIONS);
 
-      res.cookie('token', data.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 1000,
-      });
-
-      return res.status(200).json({
-        message: 'Inicio de sesión exitoso',
-        user: data.user,
-      });
-    } catch (error: any) {
-      return res.status(401).json({ message: error.message || 'Error de autenticación' });
-    }
+    return res.status(200).json({
+      success: true,
+      message: 'Inicio de sesion exitoso',
+      data: { user },
+    });
   }
 
+  /**
+   * POST /api/auth/logout
+   * Borra la cookie de sesion.
+   */
   static logout(req: Request, res: Response) {
-    res.clearCookie('token');
-    return res.status(200).json({ message: 'Sesión cerrada' });
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict' as const,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sesion cerrada',
+    });
   }
 
-  static async me(req: AuthenticatedRequest, res: Response) {
-    return res.status(200).json({ user: req.user });
+  /**
+   * GET /api/auth/me
+   * Devuelve los datos del usuario autenticado.
+   * req.user fue inyectado por authenticateToken.
+   */
+  static me(req: AuthenticatedRequest, res: Response) {
+    return res.status(200).json({
+      success: true,
+      data: { user: req.user },
+    });
   }
 }

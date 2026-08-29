@@ -306,7 +306,7 @@ pnpm dev
 
 # 1. Entrar a la carpeta del frontend
 cd frontend
-
+    
 # 2. Instalar dependencias
 pnpm install
 

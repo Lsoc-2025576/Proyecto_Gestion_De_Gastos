@@ -1,77 +1,126 @@
 import { prisma } from '../config/database.js';
-import { type IUser } from '../interfaces/user.interface.js';
+import { type IUser, type UserPayload, type UserResponse } from '../interfaces/user.interface.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { ConflictError, UnauthorizedError } from '../middlewares/error-handler.middleware.js';
+
+/**
+ * Service de autenticacion.
+ * Contiene la logica de negocio: verificar emails, hashear passwords, generar JWTs.
+ * 
+ * REGLA: Este archivo NO importa express. No sabe de req/res ni cookies.
+ *        Solo recibe datos planos y devuelve datos planos.
+ */
+
+/// Usamos una funcion para que TypeScript sepa 100% que retorna string
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET no esta definido en el .env. La app no puede arrancar sin una clave secreta.');
+  }
+  return secret;
+}
+
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '8h';
 
 export class AuthService {
- 
-  static async registerUser(userData: IUser) {
-    const { name, email, password } = userData;
+  /**
+   * Registra un usuario nuevo.
+   * 
+   * Logica:
+   * 1. Verificar que el email no exista (regla de negocio)
+   * 2. Hashear la contrasena con bcrypt
+   * 3. Crear el usuario en la DB
+   * 4. Devolver el usuario SIN la contrasena
+   */
+  static async registerUser(userData: IUser): Promise<UserResponse> {
+    const { name, email, password, role } = userData;
 
-    
+    // Paso 1: Verificar que el email no este registrado
     const userExist = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (userExist) {
-      throw new Error('El correo electrónico ya está registrado.');
+      throw new ConflictError('El correo electronico ya esta registrado.');
     }
 
-    
-    const hashedPassword = await bcrypt.hash(password!, 10);
+    // Paso 2: Hashear la contrasena (nunca guardamos texto plano)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    
+    // Paso 3: Crear usuario
+    // FIX: Ya no usamos "password!" con non-null assertion.
+    //      TypeScript sabe que password es string gracias a la interfaz IUser.
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: userData.role || 'CLIENTE'
+        role: role || 'CLIENTE',
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
-    return newUser;
+    // Paso 4: Devolver datos seguros
+    return newUser as UserResponse;
   }
 
-  
-  static async loginUser(email: string, passwordAttempt: string) {
+  /**
+   * Inicia sesion de un usuario.
+   * 
+   * Logica:
+   * 1. Buscar usuario por email
+   * 2. Comparar contrasena con bcrypt
+   * 3. Generar JWT
+   * 4. Devolver usuario + token
+   * 
+   * FIX: El JWT y la cookie ahora duran lo mismo (8h por defecto).
+   *      Antes: JWT 1min, Cookie 1h -> el usuario se deslogueaba a los 60 segundos.
+   */
+  static async loginUser(
+    email: string,
+    passwordAttempt: string
+  ): Promise<{ user: UserResponse; token: string }> {
+    // Paso 1: Buscar usuario (incluye password hash para comparar)
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (!user) {
-      throw new Error('Credenciales inválidas.');
+      // Mensaje generico por seguridad: no revelamos si el email existe o no
+      throw new UnauthorizedError('Credenciales invalidas.');
     }
 
-    
+    // Paso 2: Comparar contrasenas
     const isPasswordValid = await bcrypt.compare(passwordAttempt, user.password);
     if (!isPasswordValid) {
-      throw new Error('Credenciales inválidas.');
+      throw new UnauthorizedError('Credenciales invalidas.');
     }
 
-    
-    const secret = process.env.JWT_SECRET || 'secreto_por_defecto';
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      secret,
-      { expiresIn: '1m' }
-    );
+    // Paso 3: Crear payload y firmar JWT
+    const payload: UserPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role as 'CLIENTE' | 'ADMIN',
+    };
+
+    // FIX: Usamos la configuracion centralizada. JWT y cookie duran lo mismo.
+    const token = jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
 
     return {
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role as 'CLIENTE' | 'ADMIN',
       },
-      token
+      token,
     };
   }
 }
