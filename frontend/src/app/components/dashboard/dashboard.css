@@ -5,7 +5,7 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
-  background-color:  #131a30;
+  background-color: #131a30;
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -16,62 +16,73 @@
   color: #16223f;
   display: flex;
   flex-direction: column;
-  padding: 32px 20px;
+  padding: 0 0 32px 0;
 }
 
+/* HEADER OSCURO: solo donde va el logo */
 .brand {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 32px;
+  gap: 10px;
+  padding: 32px 20px 28px;
+  background-color: #d8e1eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
 }
 
 .brand-logo-img {
-  width: 170px;
+  width: 200px;
   max-width: 100%;
   object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
 }
 
+/* bitcore*/
 .brand-name {
   font-weight: 800;
-  letter-spacing: 1.5px;
-  font-size: 16px;
+  letter-spacing: 2px;
+  font-size: 17px;
   color: #131a30;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   flex: 1;
+  padding: 24px 20px 0;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 12px;
-  border-radius: 10px;
-  font-size: 12.5px;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.4px;
   color: #16223f;
   background-color: #eef1f6;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  text-decoration: none;
 }
 
 .nav-item:hover,
 .nav-item.active {
-  background-color: #e2e7f0;
+  background-color: #d1d9e6;
+  transform: translateX(4px);
 }
 
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
+  object-fit: contain;
 }
 
 .logout-btn {
@@ -81,12 +92,13 @@
   font-size: 13px;
   font-weight: 600;
   text-align: left;
-  padding: 10px 12px;
+  padding: 10px 20px;
   cursor: pointer;
+  margin-top: auto;
 }
 
 .logout-btn:hover {
-  color: #16223f;
+  color: #dce1ea;
 }
 
 /* ===== MAIN AREA ===== */
@@ -172,9 +184,10 @@
   margin-bottom: 10px;
 }
 
-.summary-icon svg {
-  width: 48px;
-  height: 48px;
+.summary-icon img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
 
 .summary-label {
@@ -271,17 +284,60 @@
   color: #dc2626;
 }
 
+/* ===== METAS DE AHORRO ===== */
 .metas-panel {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
-.metas-icon svg {
-  width: 90px;
-  height: 90px;
-  margin-top: 8px;
+.meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #16223f;
+}
+
+.meta-percent {
+  font-size: 12px;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.meta-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: #eef1f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meta-bar-fill {
+  height: 100%;
+  background-color: #16a34a;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.meta-detail {
+  font-size: 11px;
+  color: #9aa3b2;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -289,46 +345,20 @@
   .app-shell {
     flex-direction: column;
   }
+
   .sidebar {
     width: 100%;
     flex-direction: row;
     align-items: center;
     overflow-x: auto;
   }
+
   .nav-menu {
     flex-direction: row;
   }
+
   .summary-cards,
   .lower-grid {
     grid-template-columns: 1fr;
   }
-
-  .nav-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
-.summary-icon img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: #16223f;
-  background-color: #eef1f6;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
 }

@@ -26,7 +26,7 @@
       </a>
     </nav>
 
-    <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
+    <button class="logout-btn" (click)="logout()">Cerrar Sesion</button>
   </aside>
 
   <!-- Contenido principal -->
@@ -91,7 +91,7 @@
                 <span class="mov-icon">{{ mov.icono }}</span>
                 <div class="mov-info">
                   <span class="mov-nombre">{{ mov.nombre }}</span>
-                  <span class="mov-meta">Categoría: {{ mov.categoria }} · Fecha: {{ mov.fecha }}</span>
+                  <span class="mov-meta">Categoria: {{ mov.categoria }} · Fecha: {{ mov.fecha }}</span>
                 </div>
                 <span class="mov-monto" [class.positivo]="mov.monto > 0" [class.negativo]="mov.monto < 0">
                   {{ mov.monto > 0 ? '+' : '' }}{{ mov.monto | number:'1.2-2' }}
@@ -103,20 +103,51 @@
 
         <div class="panel metas-panel">
           <h3 class="panel-title">METAS DE AHORRO</h3>
-          <div class="metas-icon">
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="12" y="8" width="40" height="52" rx="3" fill="#f8fafc" stroke="#16223f" stroke-width="2"/>
-              <rect x="24" y="4" width="16" height="8" rx="2" fill="#16223f"/>
-              <rect x="18" y="20" width="6" height="6" rx="1" fill="#16223f"/>
-              <path d="M18 23L20 25L24 20" stroke="#fff" stroke-width="1.5"/>
-              <rect x="28" y="21" width="16" height="2.5" fill="#16223f"/>
-              <rect x="18" y="32" width="6" height="6" rx="1" fill="#16223f"/>
-              <path d="M18 35L20 37L24 32" stroke="#fff" stroke-width="1.5"/>
-              <rect x="28" y="33" width="16" height="2.5" fill="#16223f"/>
-              <rect x="18" y="44" width="6" height="6" rx="1" fill="#16223f"/>
-              <path d="M18 47L20 49L24 44" stroke="#fff" stroke-width="1.5"/>
-              <rect x="28" y="45" width="16" height="2.5" fill="#16223f"/>
-            </svg>
+
+          <div class="meta-list">
+            <div class="meta-item">
+              <div class="meta-header">
+                <span class="meta-name">Ahorrar Q.50 diarios</span>
+                <span class="meta-percent">75%</span>
+              </div>
+              <div class="meta-bar-bg">
+                <div class="meta-bar-fill" style="width: 75%;"></div>
+              </div>
+              <span class="meta-detail">Q. 1,125 / Q. 1,500 este mes</span>
+            </div>
+
+            <div class="meta-item">
+              <div class="meta-header">
+                <span class="meta-name">Fondo de emergencia</span>
+                <span class="meta-percent">40%</span>
+              </div>
+              <div class="meta-bar-bg">
+                <div class="meta-bar-fill" style="width: 40%;"></div>
+              </div>
+              <span class="meta-detail">Q. 800 / Q. 2,000</span>
+            </div>
+
+            <div class="meta-item">
+              <div class="meta-header">
+                <span class="meta-name">Reducir gastos en comida</span>
+                <span class="meta-percent">60%</span>
+              </div>
+              <div class="meta-bar-bg">
+                <div class="meta-bar-fill" style="width: 60%;"></div>
+              </div>
+              <span class="meta-detail">Meta: -20% vs mes pasado</span>
+            </div>
+
+            <div class="meta-item">
+              <div class="meta-header">
+                <span class="meta-name">Llegar a Q.500 este mes</span>
+                <span class="meta-percent">90%</span>
+              </div>
+              <div class="meta-bar-bg">
+                <div class="meta-bar-fill" style="width: 90%;"></div>
+              </div>
+              <span class="meta-detail">Q. 450 / Q. 500</span>
+            </div>
           </div>
         </div>
       </section>

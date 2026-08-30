@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcore - Ingresos y Calculadora</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #0f172a;
+            overflow: hidden;
+        }
+
+        /* --- BARRA LATERAL --- */
+        .sidebar {
+            width: 260px;
+            background-color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-container {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #cbd5e1;
+            background-color: #ffffff;
+        }
+
+        .logo-container h2 {
+            font-size: 20px;
+            color: #0f172a;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .menu li {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: bold;
+            color: #1e293b;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu li:hover, .menu li.active {
+            background-color: #cbd5e1;
+        }
+
+        .logout {
+            padding: 20px 25px;
+            font-weight: bold;
+            color: #1e293b;
+            border-top: 1px solid #cbd5e1;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            background-color: #cbd5e1;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .page-title-container {
+            background-color: #cbd5e1;
+            padding: 10px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title-container h1 {
+            color: #0f172a;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        /* Grid Superior (Resumen + Calculadora) */
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        .total-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .total-card h3 {
+            font-size: 18px;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .total-amount {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+
+        /* Tarjeta Calculadora de Impuestos */
+        .calc-card {
+            background-color: #f1f5f9;
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .calc-card h3 {
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .calc-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .calc-inputs input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .calc-inputs button {
+            background-color: #0f172a;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .calc-inputs button:hover {
+            background-color: #1e293b;
+        }
+
+        .calc-results {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #334155;
+            font-weight: bold;
+            background: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        /* Secciones de Ingresos (Fijos y Variados) */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card-section {
+            background-color: #f1f5f9;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-section h2 {
+            text-align: center;
+            font-size: 18px;
+            color: #0f172a;
+            margin-bottom: 15px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            color: #334155;
+            font-size: 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            margin-top: 8px;
+            border-top: 1px solid #cbd5e1;
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 16px;
+        }
+
+        .btn-nuevo {
+            background-color: #15803d;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .btn-nuevo:hover {
+            background-color: #166534;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA LATERAL -->
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <div style="font-size: 22px;">📈</div>
+                <h2>BITCORE</h2>
+            </div>
+            <ul class="menu">
+                <li>🏠 INICIO</li>
+                <li class="active">💵 INGRESOS</li>
+                <li>📈 GASTOS</li>
+                <li>🐷 CUENTA DE AHORRO</li>
+            </ul>
+        </div>
+        <div class="logout">
+            Cerrar Sesión
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+        <div class="page-title-container">
+            <h1>INGRESOS</h1>
+        </div>
+
+        <!-- FILA SUPERIOR: Resumen + Calculadora de Impuestos -->
+        <div class="top-grid">
+            <!-- Resumen de Ingresos Totales -->
+            <div class="total-card">
+                <h3>RESUMEN DE INGRESOS TOTALES</h3>
+                <div class="total-amount">
+                    <span>💵 💰</span>
+                    <span>Q. 35,480.00</span>
+                </div>
+            </div>
+
+            <!-- Calculadora de IVA e ISR -->
+            <div class="calc-card">
+                <h3>Cálculo Rápido (IVA / ISR)</h3>
+                <div class="calc-inputs">
+                    <input type="number" id="montoInput" placeholder="Monto en Q." />
+                    <button onclick="calcularImpuestos()">Calcular</button>
+                </div>
+                <div class="calc-results">
+                    <span id="resIva">IVA (12%): Q. 0.00</span>
+                    <span id="resIsr">ISR (5%): Q. 0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secciones de Ingresos -->
+        <div class="sections-grid">
+            <!-- Ingreso Fijo -->
+            <div class="card-section">
+                <div>
+                    <h2>Ingreso Fijo</h2>
+                    <div class="item-row">
+                        <span>Salario Base</span>
+                        <span>(Q. 12,500.00)</span>
+                    </div>
+                    <div class="item-row">
+                        <span>Alquileres</span>
+                        <span>(Q. 4,500.00)</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="total-row">
+                        <span>Total Fijos:</span>
+                        <span>Q. 17,000.00</span>
+                    </div>
+                    <button class="btn-nuevo">Nuevo Ingreso +</button>
+                </div>
+            </div>
+
+            <!-- Ingreso Variado -->
+            <div class="card-section">
+                <div>
+                    <h2>Ingreso Variado</h2>
+                    <div class="item-row">
+                        <span>Freelance</span>
+                        <span>(Q. 6,280.00)</span>
+                    </div>
+                    <div class="item-row">
+                        <span>Venta Laptop</span>
+                        <span>(Q. 2,200.00)</span>
+                    </div>
+                    <div class="item-row">
+                        <span>Bono Anual</span>
+                        <span>(Q. 10,000.00)</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="total-row">
+                        <span>Total Variables:</span>
+                        <span>Q. 18,480.00</span>
+                    </div>
+                    <button class="btn-nuevo">Nuevo Ingreso +</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script sencillo para la calculadora -->
+    <script>
+        function calcularImpuestos() {
+            const monto = parseFloat(document.getElementById('montoInput').value) || 0;
+            // Cálculo referencial del IVA (ej. sacando el IVA incluido dividiendo entre 1.12 y sacando el 12%, o directo según requieras)
+            // Aquí usamos un cálculo simple de porcentaje directo para muestra:
+            const iva = monto * 0.12; 
+            const isr = monto * 0.05; // Estimación general del 5% simplificado
+
+            document.getElementById('resIva').innerText = `IVA: Q. ${iva.toFixed(2)}`;
+            document.getElementById('resIsr').innerText = `ISR: Q. ${isr.toFixed(2)}`;
+        }
+    </script>
+
+</body>
+</html>
