@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,25 +11,36 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   email = '';
   password = '';
   errorMessage = '';
   isLoading = false;
 
-  // Exponemos el signal directo del AuthService para usarlo en el HTML
-  sessionExpired = this.authService.sessionExpired;
+  // Variable para mostrar el mensaje estético según el motivo de salida
+  sessionMessage: string | null = null;
+
+  ngOnInit() {
+    // Capturamos el motivo enviado por la URL (ej: ?reason=inactivity o ?reason=expired)
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+
+    if (reason === 'inactivity') {
+      this.sessionMessage = 'Tu sesión ha expirado debido a un periodo de inactividad.';
+    } else if (reason === 'expired') {
+      this.sessionMessage = 'Tu sesión ha caducado por seguridad. Por favor, inicia sesión de nuevo.';
+    }
+  }
 
   login() {
-    // Si el usuario intenta loguearse de nuevo, ocultamos el aviso de "sesion expirada"
+    // Limpiamos banderas previas si las hubiera
     this.authService.clearSessionExpiredFlag();
 
-    // Validacion basica antes de enviar
     if (!this.email || !this.password) {
-      this.errorMessage = 'Email y contrasena son obligatorios.';
+      this.errorMessage = 'Email y contraseña son obligatorios.';
       return;
     }
 
@@ -41,15 +52,14 @@ export class LoginComponent {
         next: (response) => {
           this.isLoading = false;
           if (response.success) {
-            // FIX: El backend ya seteo la cookie. No guardamos nada en localStorage.
             this.router.navigate(['/dashboard']);
           } else {
-            this.errorMessage = response.message || 'Error al iniciar sesion';
+            this.errorMessage = response.message || 'Error al iniciar sesión';
           }
         },
         error: (error) => {
           this.isLoading = false;
-          this.errorMessage = error.message || 'Error de conexion';
+          this.errorMessage = error.message || 'Error de conexión';
         }
       });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,18 +19,14 @@ interface Movimiento {
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // FIX: Usamos el signal del AuthService en vez de una variable 'any'.
-  // El signal es reactivo: si el usuario cambia (logout), la vista se actualiza sola.
-  // Ademas esta tipado: sabemos que tiene id, name, email, role.
   get user(): User | null {
     return this.authService.user();
   }
 
-  // Datos de ejemplo — luego vendran del backend
   saldoTotal = 10850;
   gastosTotales = 4580;
   ahorrosTotales = 6310;
@@ -43,11 +39,71 @@ export class DashboardComponent implements OnInit {
     { icono: '⛽', nombre: 'Gasolina', categoria: 'Deuda', fecha: '05/08', monto: -55.99 },
   ];
 
+  // Control de inactividad
+  private inactivityTimeout: any;
+  private readonly IDLE_TIME_LIMIT = 10000
+  //15 * 60 * 1000; // 15 minutos de inactividad (ajústalo si deseas probar rápido, ej: 30000 para 30s)
+  private boundResetTimer = this.resetInactivityTimer.bind(this);
+
   ngOnInit() {
-    // FIX: Ya no verificamos manualmente la sesion aqui.
-    // El authGuard se encarga de eso ANTES de cargar este componente.
-    // Si llegamos aqui, es porque el usuario esta autenticado.
+    this.initInactivityListener();
   }
+
+  ngOnDestroy() {
+    this.clearInactivityListener();
+  }
+
+  /**
+   * Configura los escuchas de eventos de actividad del usuario en el DOM
+   */
+  private initInactivityListener() {
+    window.addEventListener('mousemove', this.boundResetTimer);
+    window.addEventListener('keydown', this.boundResetTimer);
+    window.addEventListener('click', this.boundResetTimer);
+    window.addEventListener('scroll', this.boundResetTimer);
+
+    this.resetInactivityTimer();
+  }
+
+  /**
+   * Remueve los listeners para evitar fugas de memoria
+   */
+  private clearInactivityListener() {
+    window.removeEventListener('mousemove', this.boundResetTimer);
+    window.removeEventListener('keydown', this.boundResetTimer);
+    window.removeEventListener('click', this.boundResetTimer);
+    window.removeEventListener('scroll', this.boundResetTimer);
+
+    if (this.inactivityTimeout) {
+      clearTimeout(this.inactivityTimeout);
+    }
+  }
+
+  /**
+   * Reinicia el temporizador cada vez que detecta interacción
+   */
+  private resetInactivityTimer() {
+    if (this.inactivityTimeout) {
+      clearTimeout(this.inactivityTimeout);
+    }
+
+    this.inactivityTimeout = setTimeout(() => {
+      this.handleSessionTimeout();
+    }, this.IDLE_TIME_LIMIT);
+  }
+
+  /**
+   * Ejecuta el cierre de sesión por inactividad
+   */
+  private handleSessionTimeout() {
+  // Limpiamos el usuario localmente
+  this.authService.clearUser();
+  
+  // Redirigimos al login enviando el motivo por parámetro en la URL
+  this.router.navigate(['/login'], { 
+    queryParams: { reason: 'inactivity' } 
+  });
+}
 
   logout() {
     this.authService.logout().subscribe({
@@ -55,7 +111,6 @@ export class DashboardComponent implements OnInit {
         this.router.navigate(['/login']);
       },
       error: () => {
-        // Incluso si el backend falla, limpiamos local y redirigimos
         this.authService.clearUser();
         this.router.navigate(['/login']);
       }

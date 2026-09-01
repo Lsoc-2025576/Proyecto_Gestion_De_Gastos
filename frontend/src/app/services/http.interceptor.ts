@@ -49,7 +49,9 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
           case 401:
             message = error.error?.message || 'Sesion expirada. Por favor inicia sesion.';
             authService.notifySessionExpired();
-            router.navigate(['/login']);
+            router.navigate(['/login'], { 
+              queryParams: { reason: 'expired' } 
+            });
             break;
           case 403:
             message = error.error?.message || 'No tienes permisos para realizar esta accion.';

@@ -11,6 +11,18 @@
     <h2>BITCORE</h2>
     <p class="subtitle">Gestor de Gastos</p>
 
+    <!-- Notificación estética de sesión expirada / inactividad -->
+    @if (sessionMessage) {
+  <div style="background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fcd34d; padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; text-align: left;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+    <span>{{ sessionMessage }}</span>
+  </div>
+}
+
     <form (ngSubmit)="login()">
       <div class="input-group">
         <label>Correo Electrónico</label>
@@ -35,10 +47,4 @@
       ¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a>
     </div>
   </div>
-
-  @if (sessionExpired()) {
-    <div class="session-toast">
-      Tu sesión ha expirado. Por favor, inicia sesión de nuevo.
-    </div>
-  }
 </div>

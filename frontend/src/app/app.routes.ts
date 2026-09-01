@@ -3,7 +3,7 @@ import { LoginComponent } from './components/login/login';
 import { RegisterComponent } from './components/register/register';
 import { DashboardComponent } from './components/dashboard/dashboard';
 import { ProfileComponent } from './components/profile/profile';
-import { IngresosComponent } from './components/ingresos/ingresos';
+//import { IngresosComponent } from './components/ingresos/ingresos';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -15,7 +15,7 @@ export const routes: Routes = [
   // Si el usuario no esta autenticado, ni siquiera ve el flash de la pagina.
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
-  { path: 'ingresos', component: IngresosComponent, canActivate: [authGuard] },
+//  { path: 'ingresos', component: IngresosComponent, canActivate: [authGuard] },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
