@@ -78,6 +78,10 @@ export class AuthService {
    * Nosotros solo recibimos los datos del usuario.
    */
   login(credentials: LoginCredentials): Observable<ApiResponse<{ user: User }>> {
+    // Limpiamos cualquier residuo previo en localStorage para evitar conflictos de cuentas
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     return this.http.post<ApiResponse<{ user: User }>>(
       `${this.apiUrl}/login`,
       credentials,
@@ -86,6 +90,14 @@ export class AuthService {
       tap(response => {
         if (response.success && response.data?.user) {
           this._user.set(response.data.user);
+          
+          // Guardamos el timestamp exacto en el que caducará la sesión basado en el tiempo configurado
+          const expirationMs = 10 * 1000
+          30 * 60 * 1000; 
+          
+
+          const expirationTime = new Date().getTime() + expirationMs;
+          localStorage.setItem('tokenExpirationTime', expirationTime.toString());
         }
       })
     );
@@ -130,6 +142,9 @@ export class AuthService {
   /** Limpia el estado del usuario (usado en logout o cuando el token expira) */
   clearUser(): void {
     this._user.set(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('tokenExpirationTime');
   }
 
   /**

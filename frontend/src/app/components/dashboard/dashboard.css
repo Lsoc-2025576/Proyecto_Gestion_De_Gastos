@@ -16,10 +16,10 @@
   color: #16223f;
   display: flex;
   flex-direction: column;
-  padding: 0 0 32px 0;
+  padding: 0;
 }
 
-/* HEADER OSCURO: solo donde va el logo */
+/* HEADER SUPERIOR: donde va el logo */
 .brand {
   display: flex;
   flex-direction: column;
@@ -39,7 +39,6 @@
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
 }
 
-/* bitcore*/
 .brand-name {
   font-weight: 800;
   letter-spacing: 2px;
@@ -53,16 +52,19 @@
   flex-direction: column;
   gap: 14px;
   flex: 1;
-  padding: 24px 20px 0;
+  padding: 24px 20px;
 }
 
+/* BOTONES DEL MENÚ (Tamaño unificado) */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
+  gap: 16px;
+  width: 100%;
+  height: 64px; /* Aumentado para dar mayor altura y tamaño */
+  padding: 0 20px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 15px; /* Texto ligeramente más grande */
   font-weight: 700;
   letter-spacing: 0.4px;
   color: #16223f;
@@ -79,26 +81,36 @@
 }
 
 .nav-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px; /* Icono ligeramente más grande */
+  height: 28px;
   flex-shrink: 0;
   object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* BOTÓN DE CERRAR SESIÓN (Mismo tamaño y color exacto de la parte superior) */
 .logout-btn {
-  background: none;
+  background-color: #d8e1eb;
   border: none;
-  color: #6b7280;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: left;
-  padding: 10px 20px;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: #16223f;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
   cursor: pointer;
   margin-top: auto;
+  transition: background-color 0.15s ease;
 }
 
 .logout-btn:hover {
-  color: #dce1ea;
+  background-color: #c5d3e4;
+  color: #131a30;
 }
 
 /* ===== MAIN AREA ===== */
@@ -113,11 +125,14 @@
   color: #16223f;
   display: flex;
   align-items: center;
-  padding: 14px 32px;
+  padding: 0 32px;
   gap: 16px;
+  justify-content: space-between;
+  height: 70px;
 }
 
 .topbar-avatar {
+  order: 1;
   width: 38px;
   height: 38px;
   background-color: #ffffff;
@@ -134,15 +149,15 @@
 }
 
 .topbar-title {
-  flex: 1;
-  text-align: center;
+  order: 2;
+  margin: 0 auto;
   font-size: 18px;
   font-weight: 800;
   letter-spacing: 1px;
-  margin: 0;
 }
 
 .topbar-user {
+  order: 3;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -172,34 +187,38 @@
 .summary-card {
   background-color: #fff;
   border-radius: 14px;
-  padding: 24px;
+  padding: 36px 24px; /* Aumentamos el padding vertical para hacerla más alta */
   text-align: center;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .summary-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .summary-icon img {
-  width: 64px;
-  height: 64px;
+  width: 76px; /* Icono ligeramente más grande */
+  height: 76px;
   object-fit: contain;
 }
 
 .summary-label {
-  font-size: 12px;
+  font-size: 13px; /* Texto descriptivo un poco más legible */
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #6b7280;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 
 .summary-value {
-  font-size: 22px;
+  font-size: 28px; /* Cifra principal más grande y destacada */
   font-weight: 800;
   color: #16223f;
   margin: 0;
@@ -285,21 +304,41 @@
 }
 
 /* ===== METAS DE AHORRO ===== */
+
+.metas-panel .panel-title {
+  color: #050505; /* El color exacto que desees para ese título */
+}
+
 .metas-panel {
   display: flex;
   flex-direction: column;
+  background-color: #3a506b;
+  border-radius: 14px;
+  position: relative;
+}
+
+/*3a506b*/
+.metas-inner-container {
+  background-color: #ffffff;
+  border: 2px solid #d8e1eb;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .meta-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .meta-header {
@@ -361,4 +400,73 @@
   .lower-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Contenedor principal del movimiento mensual */
+.movimiento-panel {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+/* Lista de movimientos en formato de filas independientes */
+.movimiento-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espacio entre cada renglón */
+}
+
+/* Cada fila tipo tarjeta con fondo azul oscuro */
+.movimiento-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  background-color: #16223f; 
+  padding: 12px 18px;
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+.movimiento-item:nth-child(even) {
+  background-color: #61727d; /* Un tono intermedio más claro y elegante */
+}
+
+.mov-icon {
+  font-size: 1.3rem;
+}
+
+.mov-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mov-nombre {
+  font-weight: 600;
+  color: #ffffff; /* Texto blanco para que resalte */
+  font-size: 0.95rem;
+}
+
+.mov-meta {
+  font-size: 0.75rem;
+  color: #a0aec0; /* Texto secundario gris claro */
+}
+
+.mov-monto {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Mantenemos tus colores para positivo y negativo, asegurando buena visibilidad */
+.mov-monto.positivo {
+  color: #48bb78; 
+}
+
+.mov-monto.negativo {
+  color: #fc8181; 
 }

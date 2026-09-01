@@ -41,16 +41,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Control de inactividad
   private inactivityTimeout: any;
-  private readonly IDLE_TIME_LIMIT = 10000
-  //15 * 60 * 1000; // 15 minutos de inactividad (ajústalo si deseas probar rápido, ej: 30000 para 30s)
+  private readonly IDLE_TIME_LIMIT = 10000; // 15 minutos de inactividad
   private boundResetTimer = this.resetInactivityTimer.bind(this);
+
+  // Control de expiración absoluta por el .env
+  private envTokenInterval: any;
 
   ngOnInit() {
     this.initInactivityListener();
+    this.initEnvTokenExpirationChecker();
   }
 
   ngOnDestroy() {
     this.clearInactivityListener();
+    if (this.envTokenInterval) {
+      clearInterval(this.envTokenInterval);
+    }
+  }
+
+  /**
+   * Revisa cada segundo si el token configurado en el .env ha expirado por tiempo absoluto
+   */
+  private initEnvTokenExpirationChecker() {
+    this.envTokenInterval = setInterval(() => {
+      const expirationTimeStr = localStorage.getItem('tokenExpirationTime');
+      if (expirationTimeStr) {
+        const expirationTime = parseInt(expirationTimeStr, 10);
+        const currentTime = new Date().getTime();
+
+        if (currentTime >= expirationTime) {
+          // El tiempo del .env ha terminado
+          clearInterval(this.envTokenInterval);
+          this.authService.clearUser();
+          this.router.navigate(['/login'], { 
+            queryParams: { reason: 'expired' } 
+          });
+        }
+      }
+    }, 1000); // Revisa cada 1 segundo
   }
 
   /**
@@ -96,14 +124,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * Ejecuta el cierre de sesión por inactividad
    */
   private handleSessionTimeout() {
-  // Limpiamos el usuario localmente
-  this.authService.clearUser();
-  
-  // Redirigimos al login enviando el motivo por parámetro en la URL
-  this.router.navigate(['/login'], { 
-    queryParams: { reason: 'inactivity' } 
-  });
-}
+    this.authService.clearUser();
+    this.router.navigate(['/login'], { 
+      queryParams: { reason: 'inactivity' } 
+    });
+  }
 
   logout() {
     this.authService.logout().subscribe({
