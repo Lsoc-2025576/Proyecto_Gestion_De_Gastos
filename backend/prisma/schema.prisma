@@ -1,0 +1,51 @@
+// Generator de Prisma Client (codigo TypeScript que usamos en la app)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Configuracion de la base de datos (PostgreSQL)
+// La URL de conexion va en prisma.config.ts, NO aqui (Prisma 7+)
+datasource db {
+  provider = "postgresql"
+}
+
+// Enum para los roles de usuario.
+// Antes era String libre, ahora solo acepta CLIENTE o ADMIN.
+// Esto evita que alguien escriba 'admin' en minuscula y rompa la autorizacion.
+enum UserRole {
+  CLIENTE
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String   // Hash de bcrypt, NUNCA texto plano
+  role      UserRole @default(CLIENTE)  // Enum tipado: solo CLIENTE o ADMIN
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")  // Se actualiza automaticamente en cada cambio
+    incomes Income[]
+  @@map("users")
+}
+
+enum IncomeType {
+  FIJO
+  VARIADO
+}
+
+model Income {
+  id          Int        @id @default(autoincrement())
+  name        String
+  amount      Decimal    @db.Decimal(10, 2)
+  type        IncomeType @default(FIJO)
+  date        DateTime   @default(now())
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("incomes")
+}

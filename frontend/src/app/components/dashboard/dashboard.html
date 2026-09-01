@@ -1,0 +1,159 @@
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/logo_bitcore-removebg-preview.png" alt="Bitcore Logo" class="brand-logo-img">
+      <span class="brand-name">BITCORE</span>
+    </div>
+
+    <nav class="nav-menu">
+      <a class="nav-item active" routerLink="/dashboard">
+        <img src="assets/Icono_inicio.png" alt="Inicio" class="nav-icon">
+        INICIO
+      </a>
+      <a class="nav-item" routerLink="/ingresos">
+        <img src="assets/icono_ingreso.png" alt="Ingresos" class="nav-icon">
+        INGRESOS
+      </a>
+      <a class="nav-item" routerLink="/gastos">
+        <img src="assets/Icono__gastos_1.png" alt="Gastos" class="nav-icon">
+        GASTOS
+      </a>
+      <a class="nav-item" routerLink="/ahorro">
+        <img src="assets/Iconos_cuenta_ahorro.png" alt="Cuenta de Ahorro" class="nav-icon">
+        CUENTA DE AHORRO
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">Cerrar Sesion</button>
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <div class="topbar-avatar">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="9" r="4" fill="#16223f"/>
+          <path d="M4 21C4 16.5 7.5 14 12 14C16.5 14 20 16.5 20 21" fill="#16223f"/>
+          <path d="M6 8A6 6 0 0 1 18 8" stroke="#16223f" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <h1 class="topbar-title">GESTOR DE GASTOS</h1>
+      <div class="topbar-user">
+        <span>{{ user?.name || 'Usuario' }}</span>
+        <span class="bell">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C9.5 3 7.5 5 7.5 7.5V11C7.5 12.5 7 13.5 6 14.5H18C17 13.5 16.5 12.5 16.5 11V7.5C16.5 5 14.5 3 12 3Z" fill="#16223f"/>
+            <path d="M10 17C10 18.1 10.9 19 12 19C13.1 19 14 18.1 14 17" stroke="#16223f" stroke-width="1.5"/>
+          </svg>
+        </span>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Tarjetas resumen -->
+      <section class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-icon">
+            <img src="assets/icono_billete.png" alt="Saldo Total">
+          </div>
+          <p class="summary-label">SALDO TOTAL</p>
+          <p class="summary-value">Q. {{ saldoTotal | number:'1.0-0' }}</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon">
+            <img src="assets/icono_gastos_totales.png" alt="Gastos Totales">
+          </div>
+          <p class="summary-label">GASTOS TOTALES</p>
+          <p class="summary-value">Q. {{ gastosTotales | number:'1.0-0' }}</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon">
+            <img src="assets/icono_ahorro_totales.png" alt="Ahorros Totales">
+          </div>
+          <p class="summary-label">AHORROS TOTALES</p>
+          <p class="summary-value">Q. {{ ahorrosTotales | number:'1.0-0' }}</p>
+        </div>
+      </section>
+
+      <!-- Movimiento mensual + metas -->
+      <section class="lower-grid">
+        <div class="panel movimiento-panel">
+          <h3 class="panel-title">MOVIMIENTO MENSUAL</h3>
+          <ul class="movimiento-list">
+            @for (mov of movimientos; track mov.nombre + mov.fecha) {
+              <li class="movimiento-item">
+                <span class="mov-icon">{{ mov.icono }}</span>
+                <div class="mov-info">
+                  <span class="mov-nombre">{{ mov.nombre }}</span>
+                  <span class="mov-meta">Categoria: {{ mov.categoria }} · Fecha: {{ mov.fecha }}</span>
+                </div>
+                <span class="mov-monto" [class.positivo]="mov.monto > 0" [class.negativo]="mov.monto < 0">
+                  {{ mov.monto > 0 ? '+' : '' }}{{ mov.monto | number:'1.2-2' }}
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="panel metas-panel">
+          <h3 class="panel-title">METAS DE AHORRO</h3>
+
+          <div class="metas-inner-container">
+            <div class="meta-list">
+              <div class="meta-item">
+                <div class="meta-header">
+                  <span class="meta-name">Ahorrar Q.50 diarios</span>
+                  <span class="meta-percent">75%</span>
+                </div>
+                <div class="meta-bar-bg">
+                  <div class="meta-bar-fill" style="width: 75%;"></div>
+                </div>
+                <span class="meta-detail">Q. 1,125 / Q. 1,500 este mes</span>
+              </div>
+
+              <div class="meta-item">
+                <div class="meta-header">
+                  <span class="meta-name">Fondo de emergencia</span>
+                  <span class="meta-percent">40%</span>
+                </div>
+                <div class="meta-bar-bg">
+                  <div class="meta-bar-fill" style="width: 40%;"></div>
+                </div>
+                <span class="meta-detail">Q. 800 / Q. 2,000</span>
+              </div>
+
+              <div class="meta-item">
+                <div class="meta-header">
+                  <span class="meta-name">Reducir gastos en comida</span>
+                  <span class="meta-percent">60%</span>
+                </div>
+                <div class="meta-bar-bg">
+                  <div class="meta-bar-fill" style="width: 60%;"></div>
+                </div>
+                <span class="meta-detail">Meta: -20% vs mes pasado</span>
+              </div>
+
+              <div class="meta-item">
+                <div class="meta-header">
+                  <span class="meta-name">Llegar a Q.500 este mes</span>
+                  <span class="meta-percent">90%</span>
+                </div>
+                <div class="meta-bar-bg">
+                  <div class="meta-bar-fill" style="width: 90%;"></div>
+                </div>
+                <span class="meta-detail">Q. 450 / Q. 500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
