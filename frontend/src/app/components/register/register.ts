@@ -1,38 +1,53 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
 export class RegisterComponent {
+  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  name = '';
-  email = '';
-  password = '';
   errorMessage = '';
   isLoading = false;
 
-  onRegister(event: Event) {
-    event.preventDefault();
+  // Definimos el formulario reactivo con las mismas reglas estrictas del backend
+  registerForm: FormGroup = this.fb.group({
+    name: ['', [
+      Validators.required,
+      Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/) // Solo letras y espacios
+    ]],
+    email: ['', [
+      Validators.required,
+      Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) // Sintaxis real de correo
+    ]],
+    password: ['', [
+      Validators.required,
+      Validators.pattern(/^\d{4,}$/) // Solo números, mínimo 4 dígitos
+    ]]
+  });
 
-    if (!this.name || !this.email || !this.password) {
-      this.errorMessage = 'Todos los campos son obligatorios.';
+  onRegister() {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      this.errorMessage = 'Por favor, corrige los errores en el formulario antes de continuar.';
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.register({ name: this.name, email: this.email, password: this.password })
+    const { name, email, password } = this.registerForm.value;
+
+    this.authService.register({ name, email, password })
       .subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -50,3 +65,5 @@ export class RegisterComponent {
       });
   }
 }
+
+//1

@@ -10,23 +10,43 @@
     <h2>BITCORE</h2>
     <p class="subtitle">Crear Cuenta - Gestor de Gastos</p>
 
-    <form (submit)="onRegister($event)">
+    <!-- Alerta de error general -->
+    <div *ngIf="errorMessage" class="error-banner" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; text-align: center;">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+      
+      <!-- Campo Nombre Completo -->
       <div class="input-group">
         <label>Nombre Completo</label>
-        <input type="text" [(ngModel)]="name" name="name" required placeholder="Tu nombre">
+        <input type="text" formControlName="name" placeholder="Tu nombre">
+        <small *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+          El nombre solo debe contener letras y espacios (sin números ni símbolos).
+        </small>
       </div>
 
+      <!-- Campo Correo Electrónico -->
       <div class="input-group">
         <label>Correo Electrónico</label>
-        <input type="email" [(ngModel)]="email" name="email" required placeholder="nombre@bitcore.com">
+        <input type="email" formControlName="email" placeholder="nombre@bitcore.com">
+        <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+          Ingresa un correo electrónico válido (ej. usuario@kinal.edu.gt).
+        </small>
       </div>
 
+      <!-- Campo Contraseña -->
       <div class="input-group">
         <label>Contraseña</label>
-        <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••">
+        <input type="password" formControlName="password" placeholder="••••••••">
+        <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+          La contraseña debe ser exclusivamente numérica y de al menos 4 dígitos.
+        </small>
       </div>
 
-      <button type="submit" class="btn-submit">Registrarse →</button>
+      <button type="submit" class="btn-submit" [disabled]="isLoading">
+        {{ isLoading ? 'Registrando...' : 'Registrarse →' }}
+      </button>
     </form>
 
     <div class="login-link">

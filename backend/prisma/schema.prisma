@@ -25,6 +25,27 @@ model User {
   role      UserRole @default(CLIENTE)  // Enum tipado: solo CLIENTE o ADMIN
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")  // Se actualiza automaticamente en cada cambio
-
+    incomes Income[]
   @@map("users")
+}
+
+enum IncomeType {
+  FIJO
+  VARIADO
+}
+
+model Income {
+  id          Int        @id @default(autoincrement())
+  name        String
+  amount      Decimal    @db.Decimal(10, 2)
+  type        IncomeType @default(FIJO)
+  date        DateTime   @default(now())
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("incomes")
 }

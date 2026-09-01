@@ -6,6 +6,7 @@ import { testDbConnection } from './config/database.js';
 import authRoutes from './routes/auth.routes.js';
 import { authenticateToken } from './middlewares/auth.middleware.js';
 import { errorHandler, NotFoundError } from './middlewares/error-handler.middleware.js';
+import incomeRoutes from './routes/income.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,8 @@ app.get('/api/health', (req, res) => {
 
 // Modulo de autenticacion
 app.use('/api/auth', authRoutes);
+
+app.use('/api/incomes', incomeRoutes);
 
 // Ejemplo de ruta protegida (puedes eliminarla si no la usas)
 app.get('/api/protected-route', authenticateToken, (req, res) => {
