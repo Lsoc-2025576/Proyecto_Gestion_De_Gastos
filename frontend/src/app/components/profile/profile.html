@@ -1,0 +1,60 @@
+<div class="profile-container">
+  <!-- Navbar superior con identidad Bitcore -->
+  <header class="navbar">
+    <div class="logo-section">
+      <div class="logo-badge">B</div>
+      <div>
+        <h1>BITCORE</h1>
+        <p>Gestor de Gastos</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button routerLink="/dashboard" class="btn-back">← Volver al Dashboard</button>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- Contenido del Perfil -->
+  <main class="profile-main">
+    <div class="profile-card">
+      
+      <!-- Cabecera de la tarjeta con insignia de Rol -->
+      <div class="profile-header">
+        <div class="user-avatar">{{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}</div>
+        <div>
+          <h2>{{ user?.name || 'Usuario' }}</h2>
+          <span class="role-badge" [ngClass]="{'admin-badge': user?.role === 'ADMIN', 'user-badge': user?.role !== 'ADMIN'}">
+            {{ user?.role || 'USER' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Descripción dinámica según el rol -->
+      <div class="role-description">
+        <h3>Perfil de Acceso</h3>
+        <p *ngIf="user?.role === 'ADMIN'; else standardUserDesc">
+          <strong>Administrador del Sistema:</strong> Posee control total sobre la plataforma, con privilegios avanzados para la gestión de usuarios, supervisión global de registros financieros, control de políticas de seguridad y administración de configuraciones críticas del sistema Bitcore.
+        </p>
+        <ng-template #standardUserDesc>
+          <p>
+            <strong>Usuario Estándar:</strong> Cuenta con permisos orientados a la gestión y consulta de sus datos financieros personales, permitiéndole registrar transacciones, revisar historiales de gastos y mantener organizada su información presupuestaria de manera segura dentro de la plataforma.
+          </p>
+        </ng-template>
+      </div>
+
+      <!-- Detalles de credenciales e identificador -->
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Identificador Único (ID)</label>
+          <p class="code-text">{{ user?.id || 'No disponible' }}</p>
+        </div>
+
+        <div class="detail-item">
+          <label>Correo Electrónico</label>
+          <p>{{ user?.email || 'No disponible' }}</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
