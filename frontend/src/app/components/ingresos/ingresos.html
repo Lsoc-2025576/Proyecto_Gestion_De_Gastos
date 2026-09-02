@@ -201,14 +201,7 @@
           </div>
 
           <!-- NUEVO: aviso informativo de IVA total (opcional, solo si hay ítems en Régimen Opcional Simplificado) -->
-          @if (totalIvaCobrado() > 0) {
-            <div class="card" style="grid-column: 1 / -1; border-left: 4px solid #8B5FBF;">
-              <span style="font-size: 13px; color: #5B6478;">
-                <strong style="color:#8B5FBF;">IVA total cobrado a clientes (informativo):</strong>
-                Q. {{ totalIvaCobrado() | number:'1.2-2' }} — este monto no es tuyo, debes declararlo y pagarlo a la SAT por separado.
-              </span>
-            </div>
-          }
+          
 
         </div>
       </section>
