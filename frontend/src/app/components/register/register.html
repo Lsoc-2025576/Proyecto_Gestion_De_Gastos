@@ -10,8 +10,13 @@
     <h2>BITCORE</h2>
     <p class="subtitle">Crear Cuenta - Gestor de Gastos</p>
 
+    <!-- Alerta de éxito personalizada -->
+    <div *ngIf="successMessage" class="success-banner">
+      {{ successMessage }}
+    </div>
+
     <!-- Alerta de error general -->
-    <div *ngIf="errorMessage" class="error-banner" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; text-align: center;">
+    <div *ngIf="errorMessage" class="error-banner">
       {{ errorMessage }}
     </div>
 
@@ -21,7 +26,7 @@
       <div class="input-group">
         <label>Nombre Completo</label>
         <input type="text" formControlName="name" placeholder="Tu nombre">
-        <small *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+        <small *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="field-error">
           El nombre solo debe contener letras y espacios (sin números ni símbolos).
         </small>
       </div>
@@ -30,7 +35,7 @@
       <div class="input-group">
         <label>Correo Electrónico</label>
         <input type="email" formControlName="email" placeholder="nombre@bitcore.com">
-        <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+        <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="field-error">
           Ingresa un correo electrónico válido (ej. usuario@kinal.edu.gt).
         </small>
       </div>
@@ -39,12 +44,12 @@
       <div class="input-group">
         <label>Contraseña</label>
         <input type="password" formControlName="password" placeholder="••••••••">
-        <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" style="color: #fca5a5; font-size: 11px; margin-top: 4px; display: block;">
+        <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="field-error">
           La contraseña debe ser exclusivamente numérica y de al menos 4 dígitos.
         </small>
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="isLoading">
+      <button type="submit" class="btn-submit" [disabled]="isLoading || successMessage">
         {{ isLoading ? 'Registrando...' : 'Registrarse →' }}
       </button>
     </form>

@@ -17,6 +17,7 @@ export class RegisterComponent {
   private router = inject(Router);
 
   errorMessage = '';
+  successMessage = '';
   isLoading = false;
 
   // Definimos el formulario reactivo con las mismas reglas estrictas del backend
@@ -44,6 +45,7 @@ export class RegisterComponent {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     const { name, email, password } = this.registerForm.value;
 
@@ -52,8 +54,13 @@ export class RegisterComponent {
         next: (response) => {
           this.isLoading = false;
           if (response.success) {
-            alert('¡Cuenta creada con éxito! Por favor inicia sesión.');
-            this.router.navigate(['/login']);
+            this.successMessage = '¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...';
+            this.registerForm.disable(); // Deshabilitamos el formulario para evitar reenvíos
+            
+            // Redirigimos después de 2 segundos para que el usuario alcance a leer el mensaje personalizado
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
           } else {
             this.errorMessage = response.message || 'Error al registrar usuario';
           }
@@ -65,5 +72,3 @@ export class RegisterComponent {
       });
   }
 }
-
-//1
