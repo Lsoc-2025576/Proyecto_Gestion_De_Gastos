@@ -1,0 +1,220 @@
+<div class="app-shell">
+
+  <!-- Sidebar unificada -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/logo_bitcore-removebg-preview.png" alt="Bitcore Logo" class="brand-logo-img">
+      <span class="brand-name">BITCORE</span>
+    </div>
+
+    <nav class="nav-menu">
+      <a class="nav-item" routerLink="/dashboard">
+        <img src="assets/Icono_inicio.png" alt="Inicio" class="nav-icon">
+        INICIO
+      </a>
+      <a class="nav-item active" routerLink="/ingresos">
+        <img src="assets/icono_ingreso.png" alt="Ingresos" class="nav-icon">
+        INGRESOS
+      </a>
+      <a class="nav-item" routerLink="/gastos">
+        <img src="assets/Icono__gastos_1.png" alt="Gastos" class="nav-icon">
+        GASTOS
+      </a>
+      <a class="nav-item" routerLink="/ahorro">
+        <img src="assets/Iconos_cuenta_ahorro.png" alt="Cuenta de Ahorro" class="nav-icon">
+        CUENTA DE AHORRO
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">Cerrar Sesion</button>
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <div class="topbar-avatar">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="9" r="4" fill="#16223f"/>
+          <path d="M4 21C4 16.5 7.5 14 12 14C16.5 14 20 16.5 20 21" fill="#16223f"/>
+          <path d="M6 8A6 6 0 0 1 18 8" stroke="#16223f" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <h1 class="topbar-title">GESTOR DE GASTOS</h1>
+      <div class="topbar-user">
+        <span>{{ user?.name || 'Usuario' }}</span>
+        <span class="bell">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C9.5 3 7.5 5 7.5 7.5V11C7.5 12.5 7 13.5 6 14.5H18C17 13.5 16.5 12.5 16.5 11V7.5C16.5 5 14.5 3 12 3Z" fill="#16223f"/>
+            <path d="M10 17C10 18.1 10.9 19 12 19C13.1 19 14 18.1 14 17" stroke="#16223f" stroke-width="1.5"/>
+          </svg>
+        </span>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- RESUMEN DE INGRESOS -->
+      <section class="card resumen">
+        <h2>RESUMEN DE INGRESOS TOTALES</h2>
+        <div class="total-box"><span class="pill">Q. {{ totalGeneral() | number:'1.2-2' }}</span></div>
+        <div class="bar">
+          <div class="fijo" [style.width.%]="porcentajeFijo()"></div>
+        </div>
+        <div class="legend">
+          <span><span class="dot fijo"></span>Fijo — Q. {{ totalFijo() | number:'1.2-2' }} ({{ porcentajeFijo() | number:'1.1-1' }}%)</span>
+          <span>Variado — Q. {{ totalVariado() | number:'1.2-2' }} ({{ porcentajeVariado() | number:'1.1-1' }}%)<span class="dot variado" style="margin-left:6px;"></span></span>
+        </div>
+      </section>
+
+      <!-- INGRESO FIJO / VARIADO -->
+      <section class="cols">
+        <!-- Columna Fijos -->
+        <div class="card">
+          <h3>Ingreso Fijo</h3>
+          @for (item of fijos(); track item.id) {
+            <div class="line-item" style="cursor: pointer;" (click)="openEditModal(item)" title="Click para editar">
+              <span>{{ item.name }}</span>
+              <span>Q. {{ item.amount | number:'1.2-2' }}</span>
+            </div>
+          } @empty {
+            <div class="line-item" style="color: var(--ink-soft); font-style: italic;">No hay ingresos fijos registrados</div>
+          }
+          <hr class="divider">
+          <div class="total-row"><span>Total Fijos:</span><span>Q. {{ totalFijo() | number:'1.2-2' }}</span></div>
+          <button class="btn" (click)="openNewModal()">Nuevo Ingreso +</button>
+        </div>
+
+        <!-- Columna Variados -->
+        <div class="card">
+          <h3>Ingreso Variado</h3>
+          @for (item of variados(); track item.id) {
+            <div class="line-item" style="cursor: pointer;" (click)="openEditModal(item)" title="Click para editar">
+              <span>{{ item.name }}</span>
+              <span>Q. {{ item.amount | number:'1.2-2' }}</span>
+            </div>
+          } @empty {
+            <div class="line-item" style="color: var(--ink-soft); font-style: italic;">No hay ingresos variados registrados</div>
+          }
+          <hr class="divider">
+          <div class="total-row"><span>Total Variables:</span><span>Q. {{ totalVariado() | number:'1.2-2' }}</span></div>
+          <button class="btn" (click)="openNewModal()">Nuevo Ingreso +</button>
+        </div>
+      </section>
+
+      <!-- DESGLOSE DE IMPUESTOS -->
+      <section class="tax-section">
+        <h2>Desglose de Impuestos (ISR · IGSS · IVA)</h2>
+        <div class="tax-grid">
+
+          <!-- Tarjeta Fijos Desglose -->
+          <div class="card tax-card">
+            <h4>Ingreso Fijo — Relación de dependencia</h4>
+            <div class="subtitle">Aplica ISR (rentas de trabajo, tramos 5%/7%) e IGSS (4.83%). No aplica IVA.</div>
+
+            @for (item of fijosCalculated(); track item.id) {
+              @if (item.classification === 'SUELDO') {
+                <div class="tax-item">
+                  <span><span class="tax-tag tag-igss">IGSS 4.83%</span>Cuota laboral sobre {{ item.name }} (Q. {{ item.amount | number:'1.2-2' }})</span>
+                  <span class="amt neg">− Q. {{ item.tax.igssMensual | number:'1.2-2' }}</span>
+                </div>
+                <div class="tax-item">
+                  <span><span class="tax-tag tag-isr">ISR 5%</span>Renta de trabajo - {{ item.name }}</span>
+                  <span class="amt neg">− Q. {{ item.tax.isrMensual | number:'1.2-2' }}</span>
+                </div>
+              } @else {
+                <div class="tax-item">
+                  <span><span class="tax-tag" style="background:#5B6478;">{{ item.name }}</span> Sin cálculo automático (Capital)</span>
+                  <span class="amt">Q. 0.00</span>
+                </div>
+              }
+            } @empty {
+              <div class="tax-item"><span style="color:var(--ink-soft);">Sin ítems para desglosar</span><span>Q. 0.00</span></div>
+            }
+
+            <div class="net-row">
+              <span>Neto Ingreso Fijo</span>
+              <span class="amt">Q. {{ netoFijo() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta Variados Desglose -->
+          <div class="card tax-card">
+            <h4>Ingreso Variado — Actividades lucrativas</h4>
+            <div class="subtitle">Régimen fiscal por ítem (Pequeño Contribuyente 5% o Simplificado).</div>
+
+            @for (item of variadosCalculated(); track item.id) {
+              <div class="tax-item">
+                <span>
+                  <span class="tax-tag" [ngClass]="item.tax.etiquetaTag === 'tag-iva' ? 'tag-iva' : 'tag-isr'">
+                    {{ item.regime === 'PEQUENO_CONTRIBUYENTE' ? 'IVA+ISR 5%' : 'ISR Simplificado' }}
+                  </span>
+                  {{ item.name }} (Q. {{ item.amount | number:'1.2-2' }})
+                </span>
+                <span class="amt neg">− Q. {{ item.tax.totalDeducciones | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- NUEVO: línea informativa de IVA cobrado (solo Régimen Opcional Simplificado) -->
+              @if (item.regime === 'OPCIONAL_SIMPLIFICADO' && item.tax.ivaCobrado > 0) {
+                <div class="tax-item">
+                  <span>
+                    <span class="tax-tag tag-iva">IVA 12%</span>
+                    Cobrado al cliente sobre {{ item.name }} — no reduce tu ingreso
+                  </span>
+                  <span class="amt" style="color:#8B5FBF;">Q. {{ item.tax.ivaCobrado | number:'1.2-2' }}</span>
+                </div>
+              }
+
+              @if (item.tax.avisoLimite) {
+                <div style="font-size: 11px; color: #C0533E; margin-top: 4px; font-weight: 600;">
+                  ⚠️ {{ item.tax.avisoLimite }}
+                </div>
+              }
+            } @empty {
+              <div class="tax-item"><span style="color:var(--ink-soft);">Sin ítems para desglosar</span><span>Q. 0.00</span></div>
+            }
+
+            <div class="net-row">
+              <span>Neto Ingreso Variado</span>
+              <span class="amt">Q. {{ netoVariado() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Resumen total inferior -->
+          <div class="card tax-summary-card">
+            <div class="stat isr">
+              <div class="label">ISR estimado</div>
+              <div class="value">Q. {{ totalIsrFijo() | number:'1.2-2' }}</div>
+            </div>
+            <div class="stat igss">
+              <div class="label">IGSS trabajador</div>
+              <div class="value">Q. {{ totalIgss() | number:'1.2-2' }}</div>
+            </div>
+            <div class="stat iva">
+              <div class="label">Deducciones Variadas</div>
+              <div class="value">Q. {{ totalIsrVariado() | number:'1.2-2' }}</div>
+            </div>
+            <div class="stat neto">
+              <div class="label">Ingreso neto total</div>
+              <div class="value">Q. {{ totalNetoGeneral() | number:'1.2-2' }}</div>
+            </div>
+          </div>
+
+          <!-- NUEVO: aviso informativo de IVA total (opcional, solo si hay ítems en Régimen Opcional Simplificado) -->
+          
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal para Crear / Editar Ingreso -->
+@if (isModalOpen()) {
+  <app-income-modal
+    [incomeToEdit]="selectedIncomeForEdit()"
+    (close)="closeModal()"
+    (save)="onSaveSuccess()">
+  </app-income-modal>
+}
