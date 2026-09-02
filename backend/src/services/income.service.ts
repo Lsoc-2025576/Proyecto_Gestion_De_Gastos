@@ -18,6 +18,22 @@ export class IncomeService {
       throw new ValidationError('El tipo debe ser FIJO o VARIADO');
     }
 
+    // Validaciones de Clasificación fiscal según el tipo
+    const validFijo = ['SUELDO', 'CAPITAL'];
+    const validVariado = ['SERVICIO_FACTURADO', 'VENTA_ACTIVO'];
+
+    if (dto.type === 'FIJO' && !validFijo.includes(dto.classification)) {
+      throw new ValidationError('La clasificación fiscal no corresponde a un ingreso fijo');
+    }
+    if (dto.type === 'VARIADO' && !validVariado.includes(dto.classification)) {
+      throw new ValidationError('La clasificación fiscal no corresponde a un ingreso variado');
+    }
+
+    // Si es servicio facturado, el régimen fiscal es obligatorio
+    if (dto.classification === 'SERVICIO_FACTURADO' && !dto.regime) {
+      throw new ValidationError('El régimen fiscal es obligatorio para servicios facturados');
+    }
+
     return IncomeRepository.create({ ...dto, userId });
   }
 
@@ -43,9 +59,6 @@ export class IncomeService {
     await IncomeRepository.delete(incomeId, userId);
   }
 
-  /**
-   * Devuelve el resumen de ingresos (total, fijo, variado) para el dashboard/ingresos.
-   */
   static async getSummary(userId: number) {
     return IncomeRepository.getSummary(userId);
   }

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BITCORE — Ingresos</title>
+<style>
+  :root{
+    --bg-dark:#131B2E;
+    --bg-sidebar:#131B2E;
+    --panel:#FFFFFF;
+    --panel-soft:#F3F5F8;
+    --teal:#1FA8C9;
+    --gold:#D9A441;
+    --green:#1E7A46;
+    --green-dark:#155934;
+    --ink:#131B2E;
+    --ink-soft:#5B6478;
+    --border:#E4E7EE;
+    --isr:#C0533E;
+    --igss:#3E6FC0;
+    --iva:#8B5FBF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg-dark);
+    color:var(--ink);
+  }
+  .app{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    min-height:100vh;
+  }
+  /* SIDEBAR */
+  .sidebar{
+    background:var(--bg-sidebar);
+    padding:28px 18px;
+    display:flex;
+    flex-direction:column;
+    border-right:1px solid rgba(255,255,255,0.06);
+  }
+  .brand{
+    text-align:center;
+    color:#fff;
+    margin-bottom:36px;
+  }
+  .brand .logo{
+    width:64px;height:64px;
+    margin:0 auto 10px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#2b3654,#0f1523);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;
+  }
+  .brand .name{
+    font-weight:700;
+    letter-spacing:0.5px;
+    font-size:15px;
+  }
+  .nav{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1;
+  }
+  .nav a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border-radius:10px;
+    color:#C7CCDA;
+    text-decoration:none;
+    font-size:14.5px;
+    font-weight:600;
+  }
+  .nav a .ic{font-size:17px;}
+  .nav a.active{
+    background:#fff;
+    color:var(--ink);
+  }
+  .nav a:not(.active):hover{
+    background:rgba(255,255,255,0.06);
+  }
+  .logout{
+    text-align:center;
+    color:#fff;
+    padding:14px 0 4px;
+    font-weight:600;
+    font-size:14px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:10px;
+  }
+
+  /* MAIN */
+  .main{
+    padding:28px 34px 60px;
+  }
+  .page-title{
+    background:var(--panel-soft);
+    color:var(--ink);
+    text-align:center;
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:1px;
+    padding:16px;
+    border-radius:14px;
+    margin-bottom:22px;
+  }
+
+  .card{
+    background:var(--panel);
+    border-radius:16px;
+    padding:22px 26px;
+  }
+
+  /* Resumen */
+  .resumen{
+    margin-bottom:22px;
+  }
+  .resumen h2{
+    text-align:center;
+    font-size:17px;
+    margin:0 0 16px;
+  }
+  .total-box{
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .total-box .pill{
+    display:inline-block;
+    background:#F1F5F4;
+    color:var(--green-dark);
+    font-size:24px;
+    font-weight:800;
+    padding:8px 26px;
+    border-radius:30px;
+  }
+  .bar{
+    height:12px;
+    border-radius:8px;
+    background:var(--gold);
+    overflow:hidden;
+    display:flex;
+    margin:18px 0 10px;
+  }
+  .bar .fijo{ background:var(--teal); height:100%; }
+  .legend{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13.5px;
+    font-weight:700;
+  }
+  .legend .dot{
+    display:inline-block;
+    width:12px;height:12px;
+    border-radius:50%;
+    margin-right:6px;
+    vertical-align:middle;
+  }
+  .legend .dot.fijo{background:var(--teal);}
+  .legend .dot.variado{background:var(--gold);}
+
+  /* Two column income cards */
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:22px;
+  }
+  .cols h3{
+    text-align:center;
+    font-size:19px;
+    margin:0 0 16px;
+  }
+  .line-item{
+    display:flex;
+    justify-content:space-between;
+    font-size:14.5px;
+    padding:6px 0;
+  }
+  .line-item span:last-child{ font-weight:600; }
+  .divider{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:10px 0;
+  }
+  .total-row{
+    display:flex;
+    justify-content:space-between;
+    font-weight:800;
+    font-size:15px;
+    margin-top:4px;
+  }
+  .btn{
+    display:block;
+    width:fit-content;
+    margin:16px auto 0;
+    background:var(--green);
+    color:#fff;
+    border:none;
+    padding:9px 22px;
+    border-radius:24px;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+
+  /* Tax breakdown - NEW section */
+  .tax-section{
+    margin-top:8px;
+  }
+  .tax-section > h2{
+    color:#fff;
+    font-size:17px;
+    margin:0 0 14px;
+    padding-left:2px;
+  }
+  .tax-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  .tax-card h4{
+    margin:0 0 4px;
+    font-size:16px;
+  }
+  .tax-card .subtitle{
+    color:var(--ink-soft);
+    font-size:12.5px;
+    margin-bottom:14px;
+  }
+  .tax-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 0;
+    border-bottom:1px dashed var(--border);
+    font-size:13.5px;
+  }
+  .tax-item:last-of-type{ border-bottom:none; }
+  .tax-tag{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:0.3px;
+    padding:3px 8px;
+    border-radius:6px;
+    color:#fff;
+    margin-right:8px;
+  }
+  .tag-isr{ background:var(--isr); }
+  .tag-igss{ background:var(--igss); }
+  .tag-iva{ background:var(--iva); }
+  .tax-item .amt{ font-weight:700; }
+  .tax-item .amt.neg{ color:var(--isr); }
+  .net-row{
+    display:flex;
+    justify-content:space-between;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:2px solid var(--ink);
+    font-weight:800;
+    font-size:15px;
+  }
+  .net-row .amt{ color:var(--green-dark); }
+
+  .summary-card{
+    grid-column:1 / -1;
+    background:var(--ink);
+    color:#fff;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    text-align:center;
+    padding:22px 26px;
+  }
+  .summary-card .stat .label{
+    font-size:11.5px;
+    color:#9AA3B8;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:6px;
+  }
+  .summary-card .stat .value{
+    font-size:20px;
+    font-weight:800;
+  }
+  .summary-card .stat.isr .value{ color:#E88A78; }
+  .summary-card .stat.igss .value{ color:#7FA6E8; }
+  .summary-card .stat.iva .value{ color:#B79BE0; }
+  .summary-card .stat.neto .value{ color:#5FCF8E; }
+
+  @media (max-width:880px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{
+      flex-direction:row;
+      overflow-x:auto;
+      align-items:center;
+      padding:14px;
+    }
+    .brand{display:none;}
+    .nav{flex-direction:row;}
+    .logout{display:none;}
+    .cols, .tax-grid{grid-template-columns:1fr;}
+    .summary-card{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="logo">📊</div>
+      <div class="name">BITCORE</div>
+    </div>
+    <nav class="nav">
+      <a href="#"><span class="ic">🏠</span> Inicio</a>
+      <a href="#" class="active"><span class="ic">💵</span> Ingresos</a>
+      <a href="#"><span class="ic">📈</span> Gastos</a>
+      <a href="#"><span class="ic">🐷</span> Cuenta de Ahorro</a>
+    </nav>
+    <div class="logout">Cerrar Sesión</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="page-title">INGRESOS</div>
+
+    <!-- RESUMEN -->
+    <div class="card resumen">
+      <h2>RESUMEN DE INGRESOS TOTALES</h2>
+      <div class="total-box"><span class="pill">Q. 35,480.00</span></div>
+      <div class="bar"><div class="fijo" style="width:47.9%"></div></div>
+      <div class="legend">
+        <span><span class="dot fijo"></span>Fijo — Q. 17,000 (47.9%)</span>
+        <span>Variado — Q. 18,480 (52.1%)<span class="dot variado" style="margin-left:6px;"></span></span>
+      </div>
+    </div>
+
+    <!-- INGRESO FIJO / VARIADO -->
+    <div class="cols">
+      <div class="card">
+        <h3>Ingreso Fijo</h3>
+        <div class="line-item"><span>Salario Base</span><span>Q. 12,500.00</span></div>
+        <div class="line-item"><span>Alquileres</span><span>Q. 4,500.00</span></div>
+        <hr class="divider">
+        <div class="total-row"><span>Total Fijos:</span><span>Q. 17,000.00</span></div>
+        <button class="btn">Nuevo Ingreso +</button>
+      </div>
+      <div class="card">
+        <h3>Ingreso Variado</h3>
+        <div class="line-item"><span>Freelance</span><span>Q. 6,280.00</span></div>
+        <div class="line-item"><span>Venta Laptop</span><span>Q. 2,200.00</span></div>
+        <div class="line-item"><span>Bono Anual</span><span>Q. 10,000.00</span></div>
+        <hr class="divider">
+        <div class="total-row"><span>Total Variables:</span><span>Q. 18,480.00</span></div>
+        <button class="btn">Nuevo Ingreso +</button>
+      </div>
+    </div>
+
+    <!-- NUEVO: DESGLOSE DE IMPUESTOS -->
+    <div class="tax-section">
+      <h2>Desglose de Impuestos (ISR · IGSS · IVA)</h2>
+      <div class="tax-grid">
+
+        <div class="card tax-card">
+          <h4>Ingreso Fijo — Relación de dependencia</h4>
+          <div class="subtitle">Aplica ISR (rentas de trabajo, tramos 5%/7%) e IGSS (4.83%). No aplica IVA.</div>
+
+          <div class="tax-item">
+            <span><span class="tax-tag tag-igss">IGSS 4.83%</span>Cuota laboral sobre Q. 17,000</span>
+            <span class="amt neg">− Q. 821.10</span>
+          </div>
+          <div class="tax-item">
+            <span><span class="tax-tag tag-isr">ISR 5%</span>Renta de trabajo (mensualizado)</span>
+            <span class="amt neg">− Q. 608.95</span>
+          </div>
+
+          <div class="net-row">
+            <span>Neto Ingreso Fijo</span>
+            <span class="amt">Q. 15,569.95</span>
+          </div>
+        </div>
+
+        <div class="card tax-card">
+          <h4>Ingreso Variado — Actividades lucrativas</h4>
+          <div class="subtitle">Régimen Pequeño Contribuyente: 5% único sobre ingresos brutos (cubre IVA + ISR). No aplica IGSS.</div>
+
+          <div class="tax-item">
+            <span><span class="tax-tag tag-iva">IVA+ISR 5%</span>Tasa única sobre Q. 18,480</span>
+            <span class="amt neg">− Q. 924.00</span>
+          </div>
+          <div class="tax-item">
+            <span style="color:var(--ink-soft);">Sin retención adicional en este régimen</span>
+            <span class="amt" style="color:var(--ink-soft);">Q. 0.00</span>
+          </div>
+
+          <div class="net-row">
+            <span>Neto Ingreso Variado</span>
+            <span class="amt">Q. 17,556.00</span>
+          </div>
+        </div>
+
+        <!-- Resumen total -->
+        <div class="card summary-card">
+          <div class="stat isr">
+            <div class="label">ISR estimado</div>
+            <div class="value">Q. 608.95</div>
+          </div>
+          <div class="stat igss">
+            <div class="label">IGSS trabajador</div>
+            <div class="value">Q. 821.10</div>
+          </div>
+          <div class="stat iva">
+            <div class="label">Cuota única (IVA+ISR variado)</div>
+            <div class="value">Q. 924.00</div>
+          </div>
+          <div class="stat neto">
+            <div class="label">Ingreso neto total</div>
+            <div class="value">Q. 33,125.95</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

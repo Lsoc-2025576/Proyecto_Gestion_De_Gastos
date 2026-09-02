@@ -1,0 +1,487 @@
+* {
+  box-sizing: border-box;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: #131a30;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 270px;
+  background-color: #ffffff;
+  color: #16223f;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 20px 28px;
+  background-color: #d8e1eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.brand-logo-img {
+  width: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+.brand-name {
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 17px;
+  color: #131a30;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  padding: 24px 20px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 64px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #16223f;
+  background-color: #eef1f6;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background-color: #d1d9e6;
+  transform: translateX(4px);
+}
+
+.nav-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn {
+  background-color: #d8e1eb;
+  border: none;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: #16223f;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background-color 0.15s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c5d3e4;
+  color: #131a30;
+}
+
+/* ===== MAIN AREA & TOPBAR ===== */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background-color: #d9e8fb;
+  color: #16223f;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.topbar-avatar {
+  order: 1;
+  width: 38px;
+  height: 38px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(22, 34, 63, 0.15);
+}
+
+.topbar-avatar svg {
+  width: 22px;
+  height: 22px;
+}
+
+.topbar-title {
+  order: 2;
+  margin: 0 auto;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #16223f;
+}
+
+.topbar-user {
+  order: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #16223f;
+}
+
+.bell svg {
+  width: 20px;
+  height: 20px;
+}
+
+.content {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== TARJETAS Y PANELES DE INGRESOS ===== */
+.card {
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  padding: 22px 26px;
+  color: #16223f;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.resumen {
+  margin-bottom: 0;
+}
+
+.resumen h2 {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  color: #16223f;
+}
+
+.total-box {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.total-box .pill {
+  display: inline-block;
+  background: #F1F5F4;
+  color: #155934;
+  font-size: 26px;
+  font-weight: 800;
+  padding: 8px 26px;
+  border-radius: 30px;
+}
+
+.bar {
+  height: 12px;
+  border-radius: 8px;
+  background: #D9A441;
+  overflow: hidden;
+  display: flex;
+  margin: 18px 0 10px;
+}
+
+.bar .fijo {
+  background: #1FA8C9;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #16223f;
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.legend .dot.fijo {
+  background: #1FA8C9;
+}
+
+.legend .dot.variado {
+  background: #D9A441;
+}
+
+/* Columnas Fijo / Variado */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.cols h3 {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  color: #16223f;
+}
+
+.line-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 6px;
+  border-radius: 6px;
+  color: #16223f;
+  transition: background 0.2s;
+}
+
+.line-item:hover {
+  background: #F3F5F8;
+}
+
+.line-item span:last-child {
+  font-weight: 700;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #E4E7EE;
+  margin: 12px 0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  font-size: 14.5px;
+  margin-top: 4px;
+  color: #16223f;
+}
+
+.btn {
+  display: block;
+  width: fit-content;
+  margin: 16px auto 0;
+  background: #1E7A46;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #155934;
+}
+
+/* Sección de Impuestos */
+.tax-section {
+  margin-top: 4px;
+}
+
+.tax-section > h2 {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  padding-left: 2px;
+}
+
+.tax-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.tax-card h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #16223f;
+}
+
+.tax-card .subtitle {
+  color: #5B6478;
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+.tax-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px dashed #E4E7EE;
+  font-size: 13.5px;
+  color: #16223f;
+}
+
+.tax-item:last-of-type {
+  border-bottom: none;
+}
+
+.tax-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #fff;
+  margin-right: 8px;
+}
+
+.tag-isr {
+  background: #C0533E;
+}
+
+.tag-igss {
+  background: #3E6FC0;
+}
+
+.tag-iva {
+  background: #8B5FBF;
+}
+
+.tax-item .amt {
+  font-weight: 700;
+  color: #16223f;
+}
+
+.tax-item .amt.neg {
+  color: #C0533E;
+}
+
+.net-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #16223f;
+  font-weight: 800;
+  font-size: 14.5px;
+  color: #16223f;
+}
+
+.net-row .amt {
+  color: #155934;
+}
+
+.tax-summary-card {
+  grid-column: 1 / -1;
+  background: #16223f;
+  color: #fff;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  text-align: center;
+  padding: 22px 26px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.tax-summary-card .stat .label {
+  font-size: 11px;
+  color: #9AA3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.tax-summary-card .stat .value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.tax-summary-card .stat.isr .value {
+  color: #E88A78;
+}
+
+.tax-summary-card .stat.igss .value {
+  color: #7FA6E8;
+}
+
+.tax-summary-card .stat.iva .value {
+  color: #B79BE0;
+}
+
+.tax-summary-card .stat.neto .value {
+  color: #5FCF8E;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .nav-menu {
+    flex-direction: row;
+  }
+
+  .cols,
+  .tax-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tax-summary-card {
+    grid-template-columns: 1fr 1fr;
+  }
+}
