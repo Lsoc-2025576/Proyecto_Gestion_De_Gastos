@@ -1,11 +1,13 @@
 import { prisma } from '../config/database.js';
-import { type CreateIncomeDto, type UpdateIncomeDto } from '../dto/income.dto.js';
+import { type CreateIncomeDto, type UpdateIncomeDto, type IncomeClassification, type IncomeRegime } from '../dto/income.dto.js';
 
 export interface IncomeResponse {
   id: number;
   name: string;
   amount: number;
   type: string;
+  classification: IncomeClassification;
+  regime: IncomeRegime | null;
   date: Date;
   description: string | null;
   createdAt: Date;
@@ -13,14 +15,15 @@ export interface IncomeResponse {
 
 /**
  * Convierte el resultado crudo de Prisma (con amount: Decimal) a IncomeResponse
- * (con amount: number). Prisma usa Decimal para precision monetaria, pero el
- * resto de la app (frontend, calculos) trabaja con number normal.
+ * (con amount: number).
  */
 function toIncomeResponse(income: {
   id: number;
   name: string;
   amount: { toString(): string };
   type: string;
+  classification: IncomeClassification;
+  regime: IncomeRegime | null;
   date: Date;
   description: string | null;
   createdAt: Date;
@@ -30,6 +33,8 @@ function toIncomeResponse(income: {
     name: income.name,
     amount: Number(income.amount),
     type: income.type,
+    classification: income.classification,
+    regime: income.regime,
     date: income.date,
     description: income.description,
     createdAt: income.createdAt,
@@ -46,6 +51,8 @@ export class IncomeRepository {
         name: true,
         amount: true,
         type: true,
+        classification: true,
+        regime: true,
         date: true,
         description: true,
         createdAt: true,
@@ -67,6 +74,8 @@ export class IncomeRepository {
         name: data.name,
         amount: data.amount,
         type: data.type,
+        classification: data.classification,
+        regime: data.regime ?? null,
         date: data.date ? new Date(data.date) : new Date(),
         description: data.description ?? null,
         userId: data.userId,
@@ -76,6 +85,8 @@ export class IncomeRepository {
         name: true,
         amount: true,
         type: true,
+        classification: true,
+        regime: true,
         date: true,
         description: true,
         createdAt: true,
@@ -92,6 +103,8 @@ export class IncomeRepository {
         ...(data.name && { name: data.name }),
         ...(data.amount !== undefined && { amount: data.amount }),
         ...(data.type && { type: data.type }),
+        ...(data.classification && { classification: data.classification }),
+        ...(data.regime !== undefined && { regime: data.regime ?? null }),
         ...(data.date && { date: new Date(data.date) }),
         ...(data.description !== undefined && { description: data.description ?? null }),
       },
@@ -100,6 +113,8 @@ export class IncomeRepository {
         name: true,
         amount: true,
         type: true,
+        classification: true,
+        regime: true,
         date: true,
         description: true,
         createdAt: true,
@@ -119,11 +134,6 @@ export class IncomeRepository {
     await prisma.income.delete({ where: { id } });
   }
 
-  /**
-   * Calcula el resumen de ingresos del usuario: total, fijos y variados.
-   * Trae solo amount+type de la DB (no todos los campos) para que sea
-   * mas liviano, ya que aqui no necesitamos el resto de la info.
-   */
   static async getSummary(userId: number): Promise<{ total: number; fijo: number; variado: number }> {
     const incomes = await prisma.income.findMany({
       where: { userId },
