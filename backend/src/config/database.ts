@@ -9,9 +9,8 @@ if (!connectionString) {
   throw new Error('DATABASE_URL no esta definida en el .env');
 }
 
-// FIX IMPORTANTE: PrismaPg espera un Pool de pg, NO un objeto con connectionString.
-// Antes: new PrismaPg({ connectionString })  <- ESO ESTABA MAL
-// Ahora: new pg.Pool({ connectionString }) -> new PrismaPg(pool)
+
+
 const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
@@ -20,9 +19,9 @@ export const prisma = new PrismaClient({ adapter });
 export const testDbConnection = async () => {
   try {
     await prisma.$connect();
-    console.log('✅ Conexion a la base de datos con Prisma exitosa');
+    console.log('✅ Conexion a la base de datos con Prisma exitosa, buena suerte');
   } catch (error) {
-    console.error('❌ Error al conectar a la base de datos:', error);
-    process.exit(1); // Matamos el proceso para que Docker/PM2 lo reinicie
+    console.error('❌ Error al conectar a la base de datos, revisa el .env:', error);
+    process.exit(1); 
   }
 };

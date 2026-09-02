@@ -8,11 +8,9 @@ import { ConflictError, UnauthorizedError } from '../middlewares/error-handler.m
  * Service de autenticacion.
  * Contiene la logica de negocio: verificar emails, hashear passwords, generar JWTs.
  * 
- * REGLA: Este archivo NO importa express. No sabe de req/res ni cookies.
- *        Solo recibe datos planos y devuelve datos planos.
  */
 
-/// Usamos una funcion para que TypeScript sepa 100% que retorna string
+
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {

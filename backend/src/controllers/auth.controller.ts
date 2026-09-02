@@ -7,6 +7,7 @@ function getCookieMaxAge(): number {
   const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
   const match = expiresIn.match(/^(\d+)([smhd])$/);
 
+  //por si acaso el jwt de expire no esta configurado
   if (!match) return 1000 * 60 * 60 * 8;
 
   const value = parseInt(match[1]!);
@@ -30,7 +31,7 @@ const COOKIE_OPTIONS = {
 
 /**
  * Valida los campos del registro aplicando reglas estrictas de formato:
- * - name: Solo letras y espacios (sin números ni símbolos raros).
+ * - name: Solo letras y espacios (sin números ni símbolos).
  * - email: Sintaxis válida de correo electrónico.
  * - password: Exclusivamente dígitos, mínimo 4 caracteres.
  */

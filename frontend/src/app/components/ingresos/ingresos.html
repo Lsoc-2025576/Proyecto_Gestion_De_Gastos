@@ -33,23 +33,8 @@
   <div class="main-area">
 
     <header class="topbar">
-      <div class="topbar-avatar">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="9" r="4" fill="#16223f"/>
-          <path d="M4 21C4 16.5 7.5 14 12 14C16.5 14 20 16.5 20 21" fill="#16223f"/>
-          <path d="M6 8A6 6 0 0 1 18 8" stroke="#16223f" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
+      <!-- Se eliminaron .topbar-avatar y .topbar-user para que solo quede el título -->
       <h1 class="topbar-title">GESTOR DE GASTOS</h1>
-      <div class="topbar-user">
-        <span>{{ user?.name || 'Usuario' }}</span>
-        <span class="bell">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3C9.5 3 7.5 5 7.5 7.5V11C7.5 12.5 7 13.5 6 14.5H18C17 13.5 16.5 12.5 16.5 11V7.5C16.5 5 14.5 3 12 3Z" fill="#16223f"/>
-            <path d="M10 17C10 18.1 10.9 19 12 19C13.1 19 14 18.1 14 17" stroke="#16223f" stroke-width="1.5"/>
-          </svg>
-        </span>
-      </div>
     </header>
 
     <main class="content">
@@ -154,7 +139,6 @@
                 <span class="amt neg">− Q. {{ item.tax.totalDeducciones | number:'1.2-2' }}</span>
               </div>
 
-              <!-- NUEVO: línea informativa de IVA cobrado (solo Régimen Opcional Simplificado) -->
               @if (item.regime === 'OPCIONAL_SIMPLIFICADO' && item.tax.ivaCobrado > 0) {
                 <div class="tax-item">
                   <span>
@@ -199,9 +183,6 @@
               <div class="value">Q. {{ totalNetoGeneral() | number:'1.2-2' }}</div>
             </div>
           </div>
-
-          <!-- NUEVO: aviso informativo de IVA total (opcional, solo si hay ítems en Régimen Opcional Simplificado) -->
-          
 
         </div>
       </section>
