@@ -92,8 +92,9 @@ export class AuthService {
           this._user.set(response.data.user);
           
           // Guardamos el timestamp exacto en el que caducará la sesión basado en el tiempo configurado
-          const expirationMs = 10 * 1000
-          30 * 60 * 1000; 
+          const expirationMs = 60 * 60 * 1000;
+          //60 * 60 * 1000
+          //30 * 60 * 1000; 
           
 
           const expirationTime = new Date().getTime() + expirationMs;

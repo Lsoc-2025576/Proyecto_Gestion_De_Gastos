@@ -13,10 +13,7 @@ export interface IncomeResponse {
   createdAt: Date;
 }
 
-/**
- * Convierte el resultado crudo de Prisma (con amount: Decimal) a IncomeResponse
- * (con amount: number).
- */
+
 function toIncomeResponse(income: {
   id: number;
   name: string;

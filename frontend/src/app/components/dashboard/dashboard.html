@@ -1,5 +1,67 @@
 <div class="app-shell">
 
+  <!-- Modal / Overlay de Perfil de Usuario -->
+  <div *ngIf="isProfileOpen" class="support-overlay" (click)="toggleProfileModal()">
+    <div class="support-modal-card profile-preview-card" (click)="$event.stopPropagation()">
+      <div class="profile-header-modal">
+        <div class="user-avatar-modal">{{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}</div>
+        <div>
+          <h3>{{ user?.name || 'Usuario' }}</h3>
+          <span class="role-badge" [ngClass]="{'admin-badge': user?.role === 'ADMIN', 'user-badge': user?.role !== 'ADMIN'}">
+            {{ user?.role || 'USER' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="role-description-modal">
+        <h4>Perfil de Acceso</h4>
+        <p *ngIf="user?.role === 'ADMIN'; else standardUserDescModal">
+          <strong>Administrador:</strong> Control total sobre la plataforma, gestión de usuarios y supervisión global de registros financieros.
+        </p>
+        <ng-template #standardUserDescModal>
+          <p>
+            <strong>Usuario Estándar:</strong> Permisos para gestión y consulta de datos financieros personales y presupuestarios.
+          </p>
+        </ng-template>
+      </div>
+
+      <div class="details-grid-modal">
+        <div class="detail-item-modal">
+          <label>Identificador (ID)</label>
+          <p class="code-text">{{ user?.id || 'No disponible' }}</p>
+        </div>
+        <div class="detail-item-modal">
+          <label>Correo Electrónico</label>
+          <p>{{ user?.email || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <button class="support-close-btn" (click)="toggleProfileModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal / Overlay de Soporte -->
+  <div *ngIf="isSupportOpen" class="support-overlay" (click)="toggleSupportModal()">
+    <div class="support-modal-card" (click)="$event.stopPropagation()">
+      <div class="support-icon-header">🎧</div>
+      <h3>¿Necesitas ayuda?</h3>
+      <p>Para más información y soporte técnico, puedes comunicarte a los siguientes correos:</p>
+      <div class="support-emails">
+        <a href="mailto:lsoc-2025576@kinal.edu.gt">lsoc-2025576@kinal.edu.gt</a>
+      </div>
+      <button class="support-close-btn" (click)="toggleSupportModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal / Overlay de Cierre de Sesión Personalizado -->
+  <div *ngIf="isLoggingOut" class="logout-overlay">
+    <div class="logout-modal-card">
+      <div class="spinner"></div>
+      <h3>BITCORE</h3>
+      <p>{{ logoutMessage }}</p>
+    </div>
+  </div>
+
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">
@@ -26,14 +88,16 @@
       </a>
     </nav>
 
-    <button class="logout-btn" (click)="logout()">Cerrar Sesion</button>
+    <button class="logout-btn" (click)="logout()" [disabled]="isLoggingOut">
+      {{ isLoggingOut ? 'Saliendo...' : 'Cerrar Sesion' }}
+    </button>
   </aside>
 
   <!-- Contenido principal -->
   <div class="main-area">
 
     <header class="topbar">
-      <div class="topbar-avatar">
+      <div class="topbar-avatar" (click)="toggleSupportModal()" style="cursor: pointer;" title="Soporte técnico">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="9" r="4" fill="#16223f"/>
           <path d="M4 21C4 16.5 7.5 14 12 14C16.5 14 20 16.5 20 21" fill="#16223f"/>
@@ -41,7 +105,7 @@
         </svg>
       </div>
       <h1 class="topbar-title">GESTOR DE GASTOS</h1>
-      <div class="topbar-user">
+      <div class="topbar-user" (click)="toggleProfileModal()" style="cursor: pointer;" title="Ver perfil de usuario">
         <span>{{ user?.name || 'Usuario' }}</span>
         <span class="bell">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

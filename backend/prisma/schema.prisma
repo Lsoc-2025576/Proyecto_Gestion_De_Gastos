@@ -1,10 +1,9 @@
-// Generator de Prisma Client (codigo TypeScript que usamos en la app)
+// Generator de Prisma Client 
 generator client {
   provider = "prisma-client-js"
 }
 
 // Configuracion de la base de datos (PostgreSQL)
-// La URL de conexion va en prisma.config.ts, NO aqui (Prisma 7+)
 datasource db {
   provider = "postgresql"
 }

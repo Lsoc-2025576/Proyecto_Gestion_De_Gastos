@@ -1,13 +1,5 @@
 import { type Request, type Response, type NextFunction } from 'express';
 
-/**
- * Clase base para errores controlados de la aplicacion.
- * Permite que el errorHandler sepa si un error es un 400, 401, 403, etc.
- * 
- * Antes tenias try/catch copiados en cada controller con res.status(400).json(...).
- * Ahora los controllers pueden hacer "throw new AppError('...', 400)" y este middleware
- * se encarga de responder con el formato correcto.
- */
 export class AppError extends Error {
   constructor(
     public message: string,
@@ -53,9 +45,6 @@ export class ConflictError extends AppError {
 /**
  * Middleware de manejo de errores GLOBAL.
  * Va al FINAL de app.ts. Atrapa TODOS los errores de controllers y services.
- * 
- * BENEFICIO: Los controllers ya no necesitan try/catch. Si algo falla,
- * el error sube por la pila y este middleware lo atrapa.
  */
 export const errorHandler = (
   err: Error,
@@ -72,7 +61,7 @@ export const errorHandler = (
     });
   }
 
-  // Si es un error inesperado (bug), NO leakamos detalles al cliente
+  // Si es un error inesperado (bug)
   console.error('🔥 Error no manejado:', err);
   return res.status(500).json({
     success: false,

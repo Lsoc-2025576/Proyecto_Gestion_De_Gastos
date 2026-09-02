@@ -5,7 +5,6 @@ import { type UserPayload } from '../interfaces/user.interface.js';
 
 /**
  * Request extendido con el usuario autenticado.
- * Asi TypeScript sabe que req.user existe cuando usamos authenticateToken.
  */
 export interface AuthenticatedRequest extends Request {
   user?: UserPayload;
@@ -13,14 +12,10 @@ export interface AuthenticatedRequest extends Request {
 
 /**
  * Middleware de autenticacion.
- * Verifica el JWT que viene en la cookie O en el header Authorization.
  * 
  * Soporte dual:
- *   1. Cookie: req.cookies.token (tu formato actual)
- *   2. Header: Authorization: Bearer <token> (por si en el futuro usas mobile/API publica)
- * 
  * FIX: Ahora tambien verifica que el usuario AUN EXISTA en la base de datos.
- *      Un token valido de un usuario borrado ya no pasa.
+ * Un token valido de un usuario borrado ya no pasa.
  */
 export const authenticateToken = async (
   req: AuthenticatedRequest,
@@ -28,7 +23,7 @@ export const authenticateToken = async (
   next: NextFunction
 ) => {
   try {
-    // 1. Leer token de cookie (formato actual) o de header Bearer
+    //Leer token de cookie de header Bearer
     const tokenFromCookie = req.cookies?.token;
     const authHeader = req.headers.authorization;
     const tokenFromHeader = authHeader?.startsWith('Bearer ')
@@ -45,8 +40,7 @@ export const authenticateToken = async (
       });
     }
 
-    // 2. Verificar firma y expiracion del JWT
-    // FIX: Ya no usamos fallback 'secreto_por_defecto'. Si falta JWT_SECRET, la app no arranca.
+    //Verificar firma y expiracion del JWT
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       throw new Error('JWT_SECRET no esta definido en el .env');
@@ -54,8 +48,8 @@ export const authenticateToken = async (
 
     const decoded = jwt.verify(token, secret) as UserPayload;
 
-    // 3. Verificar que el usuario sigue existiendo en la DB
-    //    Esto evita que un token valido de un usuario eliminado siga funcionando.
+    //Verificar que el usuario sigue existiendo en la DB
+    //Esto evita que un token valido de un usuario eliminado siga funcionando.
     const userExists = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: { id: true },
@@ -69,7 +63,7 @@ export const authenticateToken = async (
       });
     }
 
-    // 4. Adjuntar usuario al request para que los controllers lo usen
+    //Adjuntar usuario al request para que los controllers lo usen
     req.user = decoded;
     next();
   } catch (error) {
