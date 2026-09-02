@@ -31,6 +31,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   gastosTotales = 4580;
   ahorrosTotales = 6310;
 
+  // Estado para controlar la animación y aviso visual de cierre de sesión
+  isLoggingOut = false;
+  logoutMessage = 'Cerrando sesión, por favor espere...';
+
   movimientos: Movimiento[] = [
     { icono: '🏠', nombre: 'Arriendo', categoria: 'Vivienda', fecha: '01/08', monto: 850.00 },
     { icono: '🛒', nombre: 'Supermercado', categoria: 'Alimentacion', fecha: '02/08', monto: -190.50 },
@@ -41,7 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Control de inactividad
   private inactivityTimeout: any;
-  private readonly IDLE_TIME_LIMIT = 10000; // 15 minutos de inactividad
+  private readonly IDLE_TIME_LIMIT = 3600000;
   private boundResetTimer = this.resetInactivityTimer.bind(this);
 
   // Control de expiración absoluta por el .env
@@ -59,9 +63,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Revisa cada segundo si el token configurado en el .env ha expirado por tiempo absoluto
-   */
   private initEnvTokenExpirationChecker() {
     this.envTokenInterval = setInterval(() => {
       const expirationTimeStr = localStorage.getItem('tokenExpirationTime');
@@ -70,7 +71,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const currentTime = new Date().getTime();
 
         if (currentTime >= expirationTime) {
-          // El tiempo del .env ha terminado
           clearInterval(this.envTokenInterval);
           this.authService.clearUser();
           this.router.navigate(['/login'], { 
@@ -78,12 +78,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           });
         }
       }
-    }, 1000); // Revisa cada 1 segundo
+    }, 1000);
   }
 
-  /**
-   * Configura los escuchas de eventos de actividad del usuario en el DOM
-   */
   private initInactivityListener() {
     window.addEventListener('mousemove', this.boundResetTimer);
     window.addEventListener('keydown', this.boundResetTimer);
@@ -93,9 +90,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.resetInactivityTimer();
   }
 
-  /**
-   * Remueve los listeners para evitar fugas de memoria
-   */
   private clearInactivityListener() {
     window.removeEventListener('mousemove', this.boundResetTimer);
     window.removeEventListener('keydown', this.boundResetTimer);
@@ -107,9 +101,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Reinicia el temporizador cada vez que detecta interacción
-   */
   private resetInactivityTimer() {
     if (this.inactivityTimeout) {
       clearTimeout(this.inactivityTimeout);
@@ -120,9 +111,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, this.IDLE_TIME_LIMIT);
   }
 
-  /**
-   * Ejecuta el cierre de sesión por inactividad
-   */
   private handleSessionTimeout() {
     this.authService.clearUser();
     this.router.navigate(['/login'], { 
@@ -131,14 +119,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.authService.clearUser();
-        this.router.navigate(['/login']);
-      }
-    });
+    if (this.isLoggingOut) return; // Evita múltiples clics
+    
+    this.isLoggingOut = true;
+    this.logoutMessage = 'Cerrando sesión de forma segura...';
+
+    setTimeout(() => {
+      this.authService.logout().subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: () => {
+          this.authService.clearUser();
+          this.router.navigate(['/login']);
+        }
+      });
+    }, 1200);
+  }
+
+  // Estado para el modal de soporte
+  isSupportOpen = false;
+
+  toggleSupportModal() {
+    this.isSupportOpen = !this.isSupportOpen;
+  }
+
+  // Estado para el modal de perfil de usuario
+  isProfileOpen = false;
+
+  toggleProfileModal() {
+    this.isProfileOpen = !this.isProfileOpen;
   }
 }

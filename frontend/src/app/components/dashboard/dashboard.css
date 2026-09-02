@@ -61,10 +61,10 @@
   align-items: center;
   gap: 16px;
   width: 100%;
-  height: 64px; /* Aumentado para dar mayor altura y tamaño */
+  height: 64px;
   padding: 0 20px;
   border-radius: 12px;
-  font-size: 15px; /* Texto ligeramente más grande */
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.4px;
   color: #16223f;
@@ -81,7 +81,7 @@
 }
 
 .nav-icon {
-  width: 28px; /* Icono ligeramente más grande */
+  width: 28px;
   height: 28px;
   flex-shrink: 0;
   object-fit: contain;
@@ -90,7 +90,7 @@
   justify-content: center;
 }
 
-/* BOTÓN DE CERRAR SESIÓN (Mismo tamaño y color exacto de la parte superior) */
+/* BOTÓN DE CERRAR SESIÓN */
 .logout-btn {
   background-color: #d8e1eb;
   border: none;
@@ -187,7 +187,7 @@
 .summary-card {
   background-color: #fff;
   border-radius: 14px;
-  padding: 36px 24px; /* Aumentamos el padding vertical para hacerla más alta */
+  padding: 36px 24px;
   text-align: center;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
   display: flex;
@@ -204,13 +204,13 @@
 }
 
 .summary-icon img {
-  width: 76px; /* Icono ligeramente más grande */
+  width: 76px;
   height: 76px;
   object-fit: contain;
 }
 
 .summary-label {
-  font-size: 13px; /* Texto descriptivo un poco más legible */
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #6b7280;
@@ -218,7 +218,7 @@
 }
 
 .summary-value {
-  font-size: 28px; /* Cifra principal más grande y destacada */
+  font-size: 28px;
   font-weight: 800;
   color: #16223f;
   margin: 0;
@@ -304,9 +304,8 @@
 }
 
 /* ===== METAS DE AHORRO ===== */
-
 .metas-panel .panel-title {
-  color: #050505; /* El color exacto que desees para ese título */
+  color: #050505;
 }
 
 .metas-panel {
@@ -317,7 +316,6 @@
   position: relative;
 }
 
-/*3a506b*/
 .metas-inner-container {
   background-color: #ffffff;
   border: 2px solid #d8e1eb;
@@ -402,7 +400,6 @@
   }
 }
 
-/* Contenedor principal del movimiento mensual */
 .movimiento-panel {
   background: #ffffff;
   padding: 20px;
@@ -410,17 +407,15 @@
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
 }
 
-/* Lista de movimientos en formato de filas independientes */
 .movimiento-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espacio entre cada renglón */
+  gap: 10px;
 }
 
-/* Cada fila tipo tarjeta con fondo azul oscuro */
 .movimiento-item {
   display: flex;
   align-items: center;
@@ -433,40 +428,269 @@
 }
 
 .movimiento-item:nth-child(even) {
-  background-color: #61727d; /* Un tono intermedio más claro y elegante */
+  background-color: #61727d;
 }
 
-.mov-icon {
-  font-size: 1.3rem;
+/* ===== ESTILOS PARA EL MODAL DE CIERRE DE SESIÓN ===== */
+.logout-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(11, 20, 32, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInOverlay 0.3s ease-in-out;
 }
 
-.mov-info {
-  flex-grow: 1;
+.logout-modal-card {
+  background: rgba(22, 39, 62, 0.95);
+  border: 1px solid rgba(93, 201, 199, 0.3);
+  border-radius: 20px;
+  padding: 36px 48px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+  width: 90%;
 }
 
-.mov-nombre {
-  font-weight: 600;
-  color: #ffffff; /* Texto blanco para que resalte */
-  font-size: 0.95rem;
+.logout-modal-card h3 {
+  color: #eef3f6;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
 }
 
-.mov-meta {
-  font-size: 0.75rem;
-  color: #a0aec0; /* Texto secundario gris claro */
+.logout-modal-card p {
+  color: #8ba9b2;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
 }
 
-.mov-monto {
-  font-weight: bold;
-  font-size: 0.95rem;
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(40, 164, 196, 0.2);
+  border-top-color: #5dc9c7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
-/* Mantenemos tus colores para positivo y negativo, asegurando buena visibilidad */
-.mov-monto.positivo {
-  color: #48bb78; 
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.mov-monto.negativo {
-  color: #fc8181; 
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== ESTILOS PARA EL MODAL DE SOPORTE ===== */
+.support-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(11, 20, 32, 0.8);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease-in-out;
+}
+
+.support-modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 400px;
+  width: 90%;
+  color: #16223f;
+}
+
+.support-icon-header {
+  font-size: 32px;
+  background: #d9e8fb;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.support-modal-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  color: #16223f;
+}
+
+.support-modal-card p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.support-emails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.support-emails a {
+  background-color: #f3f4f6;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #16223f;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.support-emails a:hover {
+  background-color: #d9e8fb;
+}
+
+.support-close-btn {
+  background-color: #16223f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.support-close-btn:hover {
+  background-color: #263859;
+}
+
+/* ===== ESTILOS ADICIONALES PARA EL MODAL DE PERFIL ===== */
+.profile-preview-card {
+  max-width: 450px !important;
+  text-align: left !important;
+  align-items: stretch !important;
+}
+
+.profile-header-modal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+}
+
+.user-avatar-modal {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #16223f, #263859);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+
+.role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.user-badge {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.admin-badge {
+  background: rgba(234, 179, 8, 0.15);
+  color: #ca8a04;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.role-description-modal {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+.role-description-modal h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.role-description-modal p {
+  font-size: 12.5px;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.details-grid-modal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.detail-item-modal {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.detail-item-modal label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.detail-item-modal p {
+  font-size: 13px;
+  color: #16223f;
+  word-break: break-all;
+  margin: 0;
+}
+
+.code-text {
+  font-family: monospace;
+  color: #4f46e5 !important;
+  font-size: 11.5px !important;
 }
