@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
   sessionMessage: string | null = null;
 
   ngOnInit() {
-    // Capturamos el motivo enviado por la URL (ej: ?reason=inactivity o ?reason=expired)
+    
     const reason = this.route.snapshot.queryParamMap.get('reason');
 
     if (reason === 'inactivity') {
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    // Limpiamos banderas previas si las hubiera
+    
     this.authService.clearSessionExpiredFlag();
 
     if (!this.email || !this.password) {
