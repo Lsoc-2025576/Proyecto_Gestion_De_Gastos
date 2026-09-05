@@ -15,17 +15,12 @@ export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // FIX: Usamos el signal tipado del AuthService.
-  // Antes: leiamos de localStorage (inseguro) y usabamos 'any'.
-  // Ahora: los datos vienen del backend via cookie httpOnly y estan tipados.
+  
   get user(): User | null {
     return this.authService.user();
   }
 
   ngOnInit() {
-    // FIX: Ya no leemos localStorage.
-    // El authGuard ya verifico que hay sesion antes de cargar este componente.
-    // Los datos del usuario vienen del AuthService (que los obtuvo de /api/auth/me).
   }
 
   logout() {

@@ -12,7 +12,7 @@ const router: Router = Router();
 // POST /api/auth/register -> Crea un usuario nuevo
 router.post('/register', AuthController.register);
 
-// POST /api/auth/login -> Inicia sesion (setea cookie con JWT)
+// POST /api/auth/login -> Inicia sesion 
 router.post('/login', AuthController.login);
 
 // POST /api/auth/logout -> Cierra sesion (borra cookie)

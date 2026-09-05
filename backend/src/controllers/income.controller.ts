@@ -85,10 +85,7 @@ export class IncomeController {
     });
   }
 
-  /**
-   * GET /api/incomes/summary
-   * Devuelve totales agregados: total general, total fijo, total variado.
-   */
+  
   static async getSummary(req: AuthenticatedRequest, res: Response) {
     const userId = req.user!.id;
     const summary = await IncomeService.getSummary(userId);
