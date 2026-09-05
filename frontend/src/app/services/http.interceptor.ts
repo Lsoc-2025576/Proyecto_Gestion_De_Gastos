@@ -5,27 +5,13 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 
-/**
- * Interceptor HTTP global.
- * 
- * RESPONSABILIDAD: Intercepta TODAS las peticiones HTTP de la app
- * y aplica logica comun antes de enviarlas o despues de recibir la respuesta.
- * 
- * Antes: cada componente manejaba errores a su manera (fetch + try/catch repetido).
- * Ahora: un solo lugar maneja 401, 403, y errores de red.
- * 
- * BENEFICIOS:
- * - Si el backend responde 401 (token expirado), redirigimos a login automaticamente.
- * - Si hay error de red, mostramos un mensaje consistente.
- * - No repetimos codigo de manejo de errores en cada componente.
- */
+
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  // Clonamos la request para agregar withCredentials si no esta presente
-  // Esto asegura que las cookies se envien en TODAS las peticiones al backend
+
   const authReq = req.clone({
     withCredentials: true,
   });
@@ -70,10 +56,10 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      // Log para desarrollo
+      
       console.error(`[HTTP ${error.status}]`, message, error);
 
-      // Relanzamos el error para que el componente tambien lo pueda manejar si quiere
+      
       return throwError(() => new Error(message));
     })
   );

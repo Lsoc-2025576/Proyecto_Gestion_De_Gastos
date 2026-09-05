@@ -61,7 +61,7 @@ export const errorHandler = (
     });
   }
 
-  // Si es un error inesperado (bug)
+  // Si es un error inesperado 
   console.error('🔥 Error no manejado:', err);
   return res.status(500).json({
     success: false,

@@ -19,7 +19,7 @@
   padding: 0;
 }
 
-/* HEADER SUPERIOR: donde va el logo */
+/*logo*/
 .brand {
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
   padding: 24px 20px;
 }
 
-/* BOTONES DEL MENÚ (Tamaño unificado) */
+/* BOTONES DEL MENÚ */
 .nav-item {
   display: flex;
   align-items: center;
@@ -113,7 +113,7 @@
   color: #131a30;
 }
 
-/* ===== MAIN AREA ===== */
+/*MAIN AREA*/
 .main-area {
   flex: 1;
   display: flex;
@@ -177,7 +177,7 @@
   gap: 24px;
 }
 
-/* ===== SUMMARY CARDS ===== */
+/* SUMMARY CARDS */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -224,7 +224,7 @@
   margin: 0;
 }
 
-/* ===== LOWER GRID ===== */
+/* LOWER GRID */
 .lower-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -303,7 +303,7 @@
   color: #dc2626;
 }
 
-/* ===== METAS DE AHORRO ===== */
+/*METAS DE AHORRo */
 .metas-panel .panel-title {
   color: #050505;
 }
@@ -377,7 +377,7 @@
   color: #9aa3b2;
 }
 
-/* ===== RESPONSIVE ===== */
+
 @media (max-width: 900px) {
   .app-shell {
     flex-direction: column;
@@ -431,7 +431,7 @@
   background-color: #61727d;
 }
 
-/* ===== ESTILOS PARA EL MODAL DE CIERRE DE SESIÓN ===== */
+/*  ESTILOS PARA EL MODAL DE CIERRE DE Sesion  */
 .logout-overlay {
   position: fixed;
   inset: 0;
@@ -492,7 +492,7 @@
   to { opacity: 1; }
 }
 
-/* ===== ESTILOS PARA EL MODAL DE SOPORTE ===== */
+/*  ESTILOS PARA EL MODAL DE SOPORTE  */
 .support-overlay {
   position: fixed;
   inset: 0;
@@ -587,7 +587,7 @@
   background-color: #263859;
 }
 
-/* ===== ESTILOS ADICIONALES PARA EL MODAL DE PERFIL ===== */
+
 .profile-preview-card {
   max-width: 450px !important;
   text-align: left !important;

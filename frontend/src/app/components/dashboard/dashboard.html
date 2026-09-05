@@ -1,6 +1,6 @@
 <div class="app-shell">
 
-  <!-- Modal / Overlay de Perfil de Usuario -->
+  
   <div *ngIf="isProfileOpen" class="support-overlay" (click)="toggleProfileModal()">
     <div class="support-modal-card profile-preview-card" (click)="$event.stopPropagation()">
       <div class="profile-header-modal">
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <!-- Modal / Overlay de Soporte -->
+  
   <div *ngIf="isSupportOpen" class="support-overlay" (click)="toggleSupportModal()">
     <div class="support-modal-card" (click)="$event.stopPropagation()">
       <div class="support-icon-header">🎧</div>
@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <!-- Modal / Overlay de Cierre de Sesión Personalizado -->
+ 
   <div *ngIf="isLoggingOut" class="logout-overlay">
     <div class="logout-modal-card">
       <div class="spinner"></div>
@@ -93,7 +93,7 @@
     </button>
   </aside>
 
-  <!-- Contenido principal -->
+ 
   <div class="main-area">
 
     <header class="topbar">
@@ -118,7 +118,7 @@
 
     <main class="content">
 
-      <!-- Tarjetas resumen -->
+      
       <section class="summary-cards">
         <div class="summary-card">
           <div class="summary-icon">
@@ -145,7 +145,7 @@
         </div>
       </section>
 
-      <!-- Movimiento mensual + metas -->
+      
       <section class="lower-grid">
         <div class="panel movimiento-panel">
           <h3 class="panel-title">MOVIMIENTO MENSUAL</h3>

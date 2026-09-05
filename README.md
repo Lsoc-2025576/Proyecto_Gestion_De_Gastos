@@ -2,6 +2,8 @@
 
 Aplicación de gestión de gastos personales con backend en **Express + TypeScript + Prisma 7** y frontend en **Angular (standalone, zoneless)**.
 
+Incluye un módulo de **Ingresos** con cálculo automático de impuestos guatemaltecos (ISR, IGSS, IVA) según el tipo de ingreso y régimen fiscal del usuario.
+
 ---
 
 ## 📁 Estructura del proyecto
@@ -36,12 +38,26 @@ Gestor_de_Gastos_BitcoreSolutions/
         │   ├── login/
         │   ├── register/
         │   ├── profile/
-        │   └── dashboard/
+        │   ├── dashboard/
+        │   └── ingresos/
+        │       ├── ingresos.ts
+        │       ├── ingresos.html
+        │       ├── ingresos.css
+        │       └── income-modal.component.ts
         ├── services/
+        │   ├── auth.service.ts
+        │   └── income.service.ts
+        ├── types/
+        │   ├── auth.types.ts
+        │   └── income.types.ts
+        ├── utils/
+        │   └── tax.utils.ts
         ├── app.config.ts
         ├── app.routes.ts
         └── app.ts
 ```
+
+> ⚠️ **Nota:** la estructura de `services/income.service.ts`, `types/income.types.ts` y el modelo `Income` en `schema.prisma` **no se han compartido en detalle** en este README — están inferidos a partir de cómo se usan en `ingresos.ts` e `income-modal.component.ts`. Si tienes esos archivos, compártelos para dejar esta sección 100% exacta (endpoints reales, nombres de columnas, etc.).
 
 ---
 
@@ -65,7 +81,6 @@ cd ../frontend
 pnpm install
 ```
 
-> ⚠️ **No uses `npx` ni `npm` para comandos de Prisma en este proyecto.** El `package.json` exige `pnpm` explícitamente (`devEngines`). Usar `npx prisma studio` genera el error `EBADDEVENGINES`. Usa siempre `pnpm prisma <comando>` o `pnpm dlx prisma <comando>`.
 
 ### 2. Variables de entorno
 
@@ -90,7 +105,7 @@ DATABASE_URL="postgresql://postgres:admin@localhost:5432/gestor_gastos_db?schema
 
 ### 3. Configuración de Prisma 7 (`prisma.config.ts`)
 
-**Importante:** desde Prisma 7, la URL de conexión para el **CLI** (migrate, studio, generate) ya NO va dentro de `schema.prisma`. Va en un archivo aparte, `backend/prisma.config.ts`:
+
 
 ```typescript
 import 'dotenv/config';
@@ -126,6 +141,7 @@ model User {
   @@map("users")
 }
 ```
+
 
 ### 4. Cliente de Prisma en tiempo de ejecución (driver adapter)
 
@@ -166,6 +182,12 @@ pnpm prisma migrate dev --name init
 
 Esto crea las tablas en PostgreSQL automáticamente a partir de `schema.prisma`, sin escribir SQL a mano.
 
+Si solo necesitas sincronizar cambios rápidos en desarrollo sin generar un archivo de migración con nombre:
+
+```bash
+pnpm prisma db push
+```
+
 ---
 
 ## ▶️ Levantar el proyecto
@@ -192,6 +214,12 @@ pnpm start
 ```
 
 Corre en `http://localhost:4200`.
+
+**Reinicio rápido (Windows, cuando el puerto queda ocupado por un proceso Node colgado):**
+
+```bash
+taskkill /f /im node.exe
+```
 
 ---
 
@@ -221,6 +249,95 @@ Angular (fetch) → Express Router → Controller → Service → Prisma → Pos
 
 **Rutas protegidas:**
 Se usa el middleware `authenticateToken`, que espera el header `Authorization: Bearer <token>` y decodifica el JWT con `jsonwebtoken`.
+
+---
+
+## 💰 Módulo de Ingresos
+
+El módulo distingue entre **Ingreso Fijo** (sueldo, relación de dependencia) e **Ingreso Variado** (actividades lucrativas / facturación independiente), y aplica automáticamente la carga fiscal correspondiente a cada ítem según las leyes tributarias de Guatemala.
+
+### Clasificación fiscal por ítem
+
+| Tipo de Ingreso | Clasificación | Impuestos aplicados |
+|---|---|---|
+| Fijo | `SUELDO` (relación de dependencia) | IGSS (4.83%) + ISR de rentas de trabajo (5%/7%, con deducción única) |
+| Fijo | `CAPITAL` (alquileres / rentas) | Sin cálculo automático (pendiente de definir régimen de rentas de capital) |
+| Variado | `SERVICIO_FACTURADO` + régimen `PEQUENO_CONTRIBUYENTE` | 5% único sobre ingreso bruto (cubre IVA + ISR combinados) |
+| Variado | `SERVICIO_FACTURADO` + régimen `OPCIONAL_SIMPLIFICADO` | ISR (5%/7% sobre ingreso bruto mensual) + IVA 12% informativo (cobrado al cliente, **no** reduce el ingreso neto del usuario) |
+| Variado | `VENTA_ACTIVO` (venta ocasional de un bien propio) | Sin cálculo automático |
+
+### Fórmulas
+
+**ISR de rentas de trabajo (clasificación `SUELDO`):**
+```
+igss_mensual = monto * 0.0483
+renta_imponible_anual = max(0, (monto * 12) - (igss_mensual * 12) - DEDUCCION_UNICA_ANUAL)
+
+si renta_imponible_anual <= 300000:
+    isr_anual = renta_imponible_anual * 0.05
+si no:
+    isr_anual = 15000 + (renta_imponible_anual - 300000) * 0.07
+
+isr_mensual = isr_anual / 12
+total_deducciones = igss_mensual + isr_mensual
+```
+
+**Pequeño Contribuyente:**
+```
+total_deducciones = monto * 0.05   // cubre IVA + ISR combinados
+```
+
+**Régimen Opcional Simplificado:**
+```
+iva_cobrado = monto * 0.12   // informativo, no se resta del ingreso del usuario
+
+si monto <= 30000:
+    isr = monto * 0.05
+si no:
+    isr = (30000 * 0.05) + (monto - 30000) * 0.07
+
+total_deducciones = isr
+```
+
+### Constantes fiscales (`utils/tax.utils.ts`)
+
+Todas centralizadas en un solo objeto para facilitar su actualización cuando cambie la ley:
+
+```typescript
+export const TAX_CONSTANTS = {
+  DEDUCCION_UNICA_ANUAL: 48000,          
+  TASA_IGSS_TRABAJADOR: 0.0483,
+  TASA_ISR_TRAMO_1: 0.05,
+  TASA_ISR_TRAMO_2: 0.07,
+  LIMITE_TRAMO_ISR_ANUAL: 300000,
+  MONTO_FIJO_TRAMO_2: 15000,
+  TASA_PEQUENO_CONTRIBUYENTE: 0.05,
+  TASA_IVA: 0.12,
+  LIMITE_MENSUAL_ISR_SIMPLIFICADO: 30000,
+  LIMITE_ANUAL_PEQUENO_CONTRIBUYENTE: 500285   
+};
+```
+
+### Componentes involucrados
+
+| Archivo | Responsabilidad |
+|---|---|
+| `ingresos.ts` | Componente principal: signals de estado, `computed()` para totales/porcentajes/netos, carga de datos vía `IncomeService` |
+| `ingresos.html` | Vista: resumen general, columnas Fijo/Variado, tarjetas de desglose de impuestos por ítem |
+| `ingresos.css` | Estilos del dashboard (paleta navy/blanco, tags de impuestos por color: ISR rojo-terracota, IGSS azul, IVA morado) |
+| `income-modal.component.ts` | Modal de creación/edición de ingresos, con campos condicionales según `type` y `classification` |
+| `utils/tax.utils.ts` | Función pura `calculateItemTax()` — toda la lógica de cálculo fiscal, sin dependencias de Angular |
+
+### Signals/computed clave en `ingresos.ts`
+
+```typescript
+totalFijo, totalVariado, totalGeneral
+porcentajeFijo, porcentajeVariado
+fijosCalculated, variadosCalculated   // ítems + su resultado de calculateItemTax()
+totalIgss, totalIsrFijo, totalIsrVariado
+totalIvaCobrado   // suma del IVA informativo de ítems en régimen Opcional Simplificado
+netoFijo, netoVariado, totalNetoGeneral
+```
 
 ---
 
@@ -255,19 +372,13 @@ Ejecuta:
 pnpm tsx src/scripts/makeAdmin.ts
 ```
 
-> ⚠️ No se recomienda usar el editor inline de **Prisma Studio** (`pnpm prisma studio`) para esto — en la versión 7.9.1 el guardado de ediciones (`update`) falla con error `Failed to fetch` (bug conocido en GitHub). Studio sigue sirviendo para *ver* datos, pero para *modificarlos* usa un script o SQL directo.
-
-Después de cambiar el rol, **vuelve a iniciar sesión** en la app — el JWT anterior sigue teniendo el rol viejo grabado hasta que generes uno nuevo.
-
----
-
 ## 🖥️ Frontend — notas de arquitectura
 
-- Angular standalone components (`RegisterComponent`, `LoginComponent`, etc.), sin `NgModule`.
+- Angular standalone components (`RegisterComponent`, `LoginComponent`, `IngresosComponent`, etc.), sin `NgModule`.
 - `provideZonelessChangeDetection()` en `app.config.ts` — Angular en modo moderno sin Zone.js.
 - Las peticiones al backend usan `fetch()` nativo apuntando a `http://localhost:3000/api/...`.
+- El módulo de Ingresos usa **signals + `computed()`** (no `Observable` + `async pipe`) para todos los totales y cálculos derivados, lo cual funciona bien en modo zoneless.
 
-> **Nota sobre modo zoneless:** si en el futuro reemplazas los `alert()` por mensajes de error en pantalla, usa `HttpClient` (ya provisto en `app.config.ts`) o `signal()` en vez de variables normales del componente — con `fetch()` nativo y variables simples, Angular zoneless puede no detectar el cambio automáticamente en la vista.
 
 ---
 
@@ -280,35 +391,7 @@ Después de cambiar el rol, **vuelve a iniciar sesión** en la app — el JWT an
 | `No database URL found` | Falta `prisma.config.ts` o el `.env` no se está cargando | Crear `prisma.config.ts` con `datasource.url` apuntando a `DATABASE_URL` |
 | `The datasource property 'url' is no longer supported in schema files` | `schema.prisma` todavía tiene `url = env(...)` (sintaxis de Prisma ≤6) | Quitar `url` del `datasource` en `schema.prisma`; la URL va solo en `prisma.config.ts` |
 | Prisma Studio: `"update" operation failed — Failed to fetch` | Bug conocido en Prisma Studio 7.9.1 al editar filas inline | Usar un script con `PrismaClient` o SQL directo en vez del editor de Studio |
+| `TS2339: Property 'X' does not exist on type 'IngresosComponent'` al compilar | El `.html` usa un `computed()` o método (ej. `totalIvaCobrado()`, `logout()`, `user`) que todavía no está definido en `ingresos.ts` | Agregar el `computed()`/propiedad faltante en la clase del componente antes de referenciarla en la plantilla |
 
 ---
 
-## 📌 Próximos pasos sugeridos
-
-- Modelo de `Gasto` / `Transaccion` en `schema.prisma`, relacionado con `User`.
-- Endpoints CRUD de gastos, protegidos con `authenticateToken`.
-- Middleware de autorización por rol (`ADMIN` vs `CLIENTE`) para rutas administrativas.
-- Reemplazar `alert()` en el frontend por mensajes de error en la UI usando `signal()`.
-# 1. Entrar a la carpeta del backend
-cd backend
-
-# 2. Instalar dependencias (por si falta alguna)
-pnpm install
-
-# 3. Generar el cliente de Prisma actualizado
-pnpm prisma generate
-
-# 4. Sincronizar y crear las tablas en tu PostgreSQL local
-pnpm prisma db push
-
-# 5. Arrancar el servidor backend (se quedará escuchando)
-pnpm dev
-
-# 1. Entrar a la carpeta del frontend
-cd frontend
-    
-# 2. Instalar dependencias
-pnpm install
-
-# 3. Iniciar la aplicación de Angular
-pnpm starttaskkill /f /im node.exe

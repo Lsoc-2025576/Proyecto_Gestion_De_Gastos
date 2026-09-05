@@ -3,20 +3,11 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../config/database.js';
 import { type UserPayload } from '../interfaces/user.interface.js';
 
-/**
- * Request extendido con el usuario autenticado.
- */
+
 export interface AuthenticatedRequest extends Request {
   user?: UserPayload;
 }
 
-/**
- * Middleware de autenticacion.
- * 
- * Soporte dual:
- * FIX: Ahora tambien verifica que el usuario AUN EXISTA en la base de datos.
- * Un token valido de un usuario borrado ya no pasa.
- */
 export const authenticateToken = async (
   req: AuthenticatedRequest,
   res: Response,

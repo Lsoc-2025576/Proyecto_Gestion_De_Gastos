@@ -19,7 +19,7 @@ export interface UserPayload {
 }
 
 /**
- * Respuesta segura: usuario SIN la contrasena.
+ * Respuesta: usuario SIN la contrasena.
  */
 export interface UserResponse {
   id: number;

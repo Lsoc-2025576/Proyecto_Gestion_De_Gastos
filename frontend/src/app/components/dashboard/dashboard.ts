@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   gastosTotales = 4580;
   ahorrosTotales = 6310;
 
-  // Estado para controlar la animación y aviso visual de cierre de sesión
+
   isLoggingOut = false;
   logoutMessage = 'Cerrando sesión, por favor espere...';
 
